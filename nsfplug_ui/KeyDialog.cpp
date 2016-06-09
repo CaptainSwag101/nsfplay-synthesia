@@ -21,18 +21,18 @@ KeyDialog::~KeyDialog()
 
 void KeyDialog::Start(int interval)
 {
-  if(m_nTimer)
+  /*if(m_nTimer)
     KillTimer(m_nTimer);
-  m_nTimer = SetTimer(1,interval,NULL);
+  m_nTimer = SetTimer(1,interval,NULL);*/
 }
 
 void KeyDialog::Stop()
 {
-  if(m_nTimer)
+  /*if(m_nTimer)
   {
     KillTimer(m_nTimer);
     m_nTimer = 0;
-  }
+  }*/
 }
 
 void KeyDialog::Reset()
@@ -75,9 +75,9 @@ void KeyDialog::OnSize(UINT nType, int cx, int cy)
 {
   CDialog::OnSize(nType, cx, cy);
   if(m_keyheader.m_hWnd)
-    m_keyheader.MoveWindow(0,0,cx,m_keyheader.MinHeight());
+    m_keyheader.MoveWindow(0,0,cx,m_keyheader.MaxHeight());
   if(m_keywindow.m_hWnd)
-    m_keywindow.MoveWindow(0,m_keyheader.MinHeight(),cx,cy-m_keyheader.MinHeight());
+    m_keywindow.MoveWindow(0,m_keyheader.MaxHeight(),cx,cy-m_keyheader.MaxHeight());
 }
 
 void KeyDialog::OnTimer(UINT nIDEvent)

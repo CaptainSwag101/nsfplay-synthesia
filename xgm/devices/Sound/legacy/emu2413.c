@@ -517,29 +517,29 @@ makeRksTable (void)
 void
 OPLL_dump2patch (const e_uint8 * dump, OPLL_PATCH * patch)
 {
-  patch[0].AM = (dump[0] >> 7) & 1;
+  patch[0].AM = (dump[0] >> 7) & 1; //amplitude modulation (tremolo)
   patch[1].AM = (dump[1] >> 7) & 1;
-  patch[0].PM = (dump[0] >> 6) & 1;
+  patch[0].PM = (dump[0] >> 6) & 1; //phase modulation (vibrato)
   patch[1].PM = (dump[1] >> 6) & 1;
-  patch[0].EG = (dump[0] >> 5) & 1;
+  patch[0].EG = (dump[0] >> 5) & 1; //don't know
   patch[1].EG = (dump[1] >> 5) & 1;
-  patch[0].KR = (dump[0] >> 4) & 1;
+  patch[0].KR = (dump[0] >> 4) & 1; //don't know
   patch[1].KR = (dump[1] >> 4) & 1;
-  patch[0].ML = (dump[0]) & 15;
+  patch[0].ML = (dump[0]) & 15; //mult factor
   patch[1].ML = (dump[1]) & 15;
-  patch[0].KL = (dump[2] >> 6) & 3;
+  patch[0].KL = (dump[2] >> 6) & 3; //RATE key level
   patch[1].KL = (dump[3] >> 6) & 3;
-  patch[0].TL = (dump[2]) & 63;
-  patch[0].FB = (dump[3]) & 7;
-  patch[0].WF = (dump[3] >> 3) & 1;
+  patch[0].TL = (dump[2]) & 63; //modulator level
+  patch[0].FB = (dump[3]) & 7; //feedback
+  patch[0].WF = (dump[3] >> 3) & 1; //wave rectification
   patch[1].WF = (dump[3] >> 4) & 1;
-  patch[0].AR = (dump[4] >> 4) & 15;
+  patch[0].AR = (dump[4] >> 4) & 15; //attack rate
   patch[1].AR = (dump[5] >> 4) & 15;
-  patch[0].DR = (dump[4]) & 15;
+  patch[0].DR = (dump[4]) & 15; //decay rate
   patch[1].DR = (dump[5]) & 15;
-  patch[0].SL = (dump[6] >> 4) & 15;
+  patch[0].SL = (dump[6] >> 4) & 15; //sustain level
   patch[1].SL = (dump[7] >> 4) & 15;
-  patch[0].RR = (dump[6]) & 15;
+  patch[0].RR = (dump[6]) & 15; //release rate
   patch[1].RR = (dump[7]) & 15;
 }
 

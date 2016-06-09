@@ -22,6 +22,7 @@ public:
 
   inline int MinWidth(){ return m_keywindow.MinWidth(); }
   inline int MaxWidth(){ return m_keywindow.MaxWidth(); }
+  inline int SynthesiaHeight() { return m_keywindow.SynthesiaHeight(); }
 
   // Œ®”Õ•”•ª
   KeyWindow m_keywindow;

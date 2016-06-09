@@ -46,7 +46,7 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     npm.cf->CreateValue("UPDATE_PLAYLIST", 0);
     npm.cf->CreateValue("MASK_INIT", 1);
     npm.cf->CreateValue("INFO_DELAY", 50);
-    npm.cf->CreateValue("INFO_FREQ", 30);
+    npm.cf->CreateValue("INFO_FREQ", 60);
     npm.cf->CreateValue("GRAPHIC_MODE", 1);
     npm.cf->CreateValue("FREQ_MODE", 1);
     npm.cf->CreateValue("LAST_PRESET", "Default");

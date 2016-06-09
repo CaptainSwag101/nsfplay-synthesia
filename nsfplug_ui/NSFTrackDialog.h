@@ -1,8 +1,8 @@
 #pragma once
 #include "NSFDialog.h"
 #include "afxcmn.h"
-#include "keydialog.h"
 #include "NSFTrackSetupDialog.h"
+#include "keydialog.h"
 
 // NSFTrackDialog ダイアログ
 
@@ -16,10 +16,13 @@ public:
   KeyDialog m_keydlg;
   int m_trkmap[NSFPlayer::NES_TRACK_MAX];
   int m_maxtrk;
-  BOOL m_showtrk[NSFPlayer::NES_TRACK_MAX];
+  //BOOL m_showtrk[NSFPlayer::NES_TRACK_MAX];
   int m_keepkey[NSFPlayer::NES_TRACK_MAX];
   int m_lastkey[NSFPlayer::NES_TRACK_MAX];
   CString m_tonestr[NSFPlayer::NES_TRACK_MAX];
+  COLORREF ColorForNote(xgm::ITrackInfo*, int);
+  COLORREF ColorForWave(int, xgm::INT16[]);
+  int octaveAdjustment();
   void InitList();
   BOOL m_initializing_list;
   NSFTrackSetupDialog m_setup;
@@ -27,6 +30,14 @@ public:
   CPen green_pen;
   CMenu m_rmenu;
   int m_trk_selected;
+  int frame_of_last_update;
+  //copied from nsfplay.h
+  int GetRegion(xgm::UINT8);
+  enum {
+    REGION_NTSC = 0,
+    REGION_PAL,
+    REGION_DENDY
+  };
 
 // ダイアログ データ
 	enum { IDD = IDD_TRKINFO };

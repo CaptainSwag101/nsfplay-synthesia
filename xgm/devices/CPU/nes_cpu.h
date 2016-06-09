@@ -35,7 +35,7 @@ public:
   ~NES_CPU ();
   void Reset ();
   void Start (int s, int i, double f=60, int a=0, int x=0, int y=0);
-  UINT32 Exec (UINT32 clock); // returns number of clocks executed
+  UINT32 Exec (UINT32 clock, bool *frameElapsed); // returns number of clocks executed and if it passed a frame boundary or not
   void SetMemory (IDevice *);
   bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
   bool Write (UINT32 adr, UINT32 val, UINT32 id=0);

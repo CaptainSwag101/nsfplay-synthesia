@@ -77,7 +77,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
 {
   int i, j;
 
-  CreateValue("RATE", 48000);
+  CreateValue("RATE", 44100);
   CreateValue("NCH",  2);
   CreateValue("BPS",  16);
   CreateValue("MASK", 0);
@@ -95,6 +95,12 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   CreateValue("DETECT_ALT", 0);
   CreateValue("VSYNC_ADJUST", 0);
   CreateValue("MULT_SPEED", 256); // clock speed multiplier
+  CreateValue("SYNTH_SPEED", 1); // pixels scrolled in synthesia per frame
+  CreateValue("DRUMS_SPEED", 1); // pixels scrolled in synthesia noise/drums per frame
+  CreateValue("SYNTHESIA_WIDTH", 841); // How wide the synthesia window is
+  CreateValue("SYNTHESIA_HEIGHT", 400); // How tall the synthesia window is
+  CreateValue("DRUMS_HEIGHT", 60); // How tall the drums window is
+  CreateValue("STARTING_OCTAVE", 1); // What numbered octave should be the furthest left. Yes, negative numbers work
   CreateValue("VRC7_PATCH", 0); // VRC7 patch set
   CreateValue("NSFE_PLAYLIST", 1); // use NSFe playlist
 

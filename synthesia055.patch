@@ -1,0 +1,1975 @@
+diff -Bwur nsfplay23src/Release/plugins/in_yansf.ini nsfplay23src synthesia 0.55/Release/plugins/in_yansf.ini
+--- nsfplay23src/Release/plugins/in_yansf.ini	Tue Mar 17 09:05:22 2015
++++ nsfplay23src synthesia 0.55/Release/plugins/in_yansf.ini	Tue Mar 17 10:40:34 2015
+@@ -137,16 +137,16 @@
+ GRAPHIC_MODE=1
+ HPF=164
+ INFO_DELAY=50
+-INFO_FREQ=30
+-INI_FILE=C:\nsfplay23src\Release\plugins\in_yansf.ini
++INFO_FREQ=60
++INI_FILE=C:\nsfplay23src synthesia 0.55\Release\plugins\in_yansf.ini
+ LAST_PRESET=Default
+ LOG_CPU=0
+ LOG_CPU_FILE=nsf_write.log
+ LOOP_NUM=2
+ LPF=112
+-MASK=31
++MASK=0
+ MASK_INIT=1
+-MASTER_VOLUME=128
++MASTER_VOLUME=255
+ MMC5_FILTER=0
+ MMC5_MUTE=0
+ MMC5_OPTION0=1
+@@ -185,3 +185,8 @@
+ VRC7_VOLUME=128
+ VSYNC_ADJUST=0
+ WRITE_TAGINFO=0
++DRUMS_HEIGHT=60
++DRUMS_SPEED=1
++SYNTHESIA_HEIGHT=400
++SYNTHESIA_WIDTH=841
++SYNTH_SPEED=2
+diff -Bwur nsfplay23src/in_yansf/in_nsf.cpp nsfplay23src synthesia 0.55/in_yansf/in_nsf.cpp
+--- nsfplay23src/in_yansf/in_nsf.cpp	Mon Mar 16 10:26:20 2015
++++ nsfplay23src synthesia 0.55/in_yansf/in_nsf.cpp	Tue Mar 17 09:10:32 2015
+@@ -46,7 +46,7 @@
+     npm.cf->CreateValue("UPDATE_PLAYLIST", 0);
+     npm.cf->CreateValue("MASK_INIT", 1);
+     npm.cf->CreateValue("INFO_DELAY", 50);
+-    npm.cf->CreateValue("INFO_FREQ", 30);
++    npm.cf->CreateValue("INFO_FREQ", 60);
+     npm.cf->CreateValue("GRAPHIC_MODE", 1);
+     npm.cf->CreateValue("FREQ_MODE", 1);
+     npm.cf->CreateValue("LAST_PRESET", "Default");
+diff -Bwur nsfplay23src/nsfplug_ui/KeyDialog.cpp nsfplay23src synthesia 0.55/nsfplug_ui/KeyDialog.cpp
+--- nsfplay23src/nsfplug_ui/KeyDialog.cpp	Mon Mar 16 10:26:22 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/KeyDialog.cpp	Tue Mar 17 09:10:32 2015
+@@ -21,18 +21,18 @@
+ 
+ void KeyDialog::Start(int interval)
+ {
+-  if(m_nTimer)
++  /*if(m_nTimer)
+     KillTimer(m_nTimer);
+-  m_nTimer = SetTimer(1,interval,NULL);
++  m_nTimer = SetTimer(1,interval,NULL);*/
+ }
+ 
+ void KeyDialog::Stop()
+ {
+-  if(m_nTimer)
++  /*if(m_nTimer)
+   {
+     KillTimer(m_nTimer);
+     m_nTimer = 0;
+-  }
++  }*/
+ }
+ 
+ void KeyDialog::Reset()
+@@ -75,9 +75,9 @@
+ {
+   CDialog::OnSize(nType, cx, cy);
+   if(m_keyheader.m_hWnd)
+-    m_keyheader.MoveWindow(0,0,cx,m_keyheader.MinHeight());
++    m_keyheader.MoveWindow(0,0,cx,m_keyheader.MaxHeight());
+   if(m_keywindow.m_hWnd)
+-    m_keywindow.MoveWindow(0,m_keyheader.MinHeight(),cx,cy-m_keyheader.MinHeight());
++    m_keywindow.MoveWindow(0,m_keyheader.MaxHeight(),cx,cy-m_keyheader.MaxHeight());
+ }
+ 
+ void KeyDialog::OnTimer(UINT nIDEvent)
+diff -Bwur nsfplay23src/nsfplug_ui/KeyDialog.h nsfplay23src synthesia 0.55/nsfplug_ui/KeyDialog.h
+--- nsfplay23src/nsfplug_ui/KeyDialog.h	Mon Mar 16 10:26:22 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/KeyDialog.h	Tue Mar 17 09:10:32 2015
+@@ -22,6 +22,7 @@
+ 
+   inline int MinWidth(){ return m_keywindow.MinWidth(); }
+   inline int MaxWidth(){ return m_keywindow.MaxWidth(); }
++  inline int SynthesiaHeight() { return m_keywindow.SynthesiaHeight(); }
+ 
+   // 鍵盤部分
+   KeyWindow m_keywindow;
+diff -Bwur nsfplay23src/nsfplug_ui/KeyHeader.cpp nsfplay23src synthesia 0.55/nsfplug_ui/KeyHeader.cpp
+--- nsfplay23src/nsfplug_ui/KeyHeader.cpp	Mon Mar 16 10:26:22 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/KeyHeader.cpp	Tue Mar 17 09:10:32 2015
+@@ -13,6 +13,12 @@
+ KeyHeader::KeyHeader(CWnd* pParent /*=NULL*/)
+ 	: CDialog(KeyHeader::IDD, pParent)
+ {
++  numberofframes = 1;
++  drums_speed = 1;
++  drumsHeight = 60;
++  synthesiaWidth = 841;
++  memset(m_nNoiseStatus, 0, sizeof(m_nNoiseStatus));
++  memset(m_nDPCMStatus, 0, sizeof(m_nDPCMStatus));
+   softgray_pen.CreatePen(PS_SOLID,1,RGB(212,212,212));
+ }
+ 
+@@ -24,8 +30,10 @@
+ 
+ void KeyHeader::Reset()
+ {
+-  m_nNoiseStatus = 0;
+-  m_nDPCMStatus = 0;
++  //m_nNoiseStatus = 0;
++  //m_nDPCMStatus = 0;
++	memset(m_nNoiseStatus, 0, sizeof(m_nNoiseStatus));
++	memset(m_nDPCMStatus, 0, sizeof(m_nDPCMStatus));
+ }
+ 
+ void KeyHeader::DoDataExchange(CDataExchange* pDX)
+@@ -47,10 +55,14 @@
+ 
+   CDC *pDC = GetDC();
+ 
+-  m_hedBitmap.LoadBitmap(IDB_KEYHEADER);
++  //m_hedBitmap.LoadBitmap(IDB_KEYHEADER);
++  //m_hedDC.CreateCompatibleDC(pDC);
++  //m_hedDC.SelectObject(&m_hedBitmap);
++
++  m_hedBitmap.CreateCompatibleBitmap(pDC,MaxWidth(),MaxHeight());
+   m_hedDC.CreateCompatibleDC(pDC);
+   m_hedDC.SelectObject(&m_hedBitmap);
+-  m_memBitmap.CreateCompatibleBitmap(pDC,MaxWidth(),MinHeight());
++  m_memBitmap.CreateCompatibleBitmap(pDC,MaxWidth(),MaxHeight());
+   m_memDC.CreateCompatibleDC(pDC);
+   m_memDC.SelectObject(&m_memBitmap);
+   m_memDC.SelectObject(&softgray_pen);
+@@ -65,25 +77,81 @@
+   CRect rect;
+   GetClientRect(rect);
+ 
+-  m_memDC.FillSolidRect(rect,RGB(0,0,0));
+-  m_memDC.BitBlt(0,0,336,20,&m_hedDC,0,0,SRCCOPY);
++  //m_memDC.FillSolidRect(rect,RGB(0,0,0));
++  //m_memDC.FillSolidRect(60, 119, 60, 1, RGB(100, 100, 100));
++  
++  //m_memDC.BitBlt(0,0,336,20,&m_hedDC,0,0,SRCCOPY);
++
++  //copy onto header and back to displace everything down
++  m_hedDC.BitBlt(0,numberofframes*drums_speed,rect.Width(),rect.Height(),&m_memDC,0,0,SRCCOPY);
++  m_memDC.BitBlt(0,0,rect.Width(),rect.Height(),&m_hedDC,0,0,SRCCOPY);
++  m_memDC.FillSolidRect(0, 0, rect.Width(), numberofframes*drums_speed, RGB(0, 0, 0));
++
++  for (int i = 0; i < numberofframes; ++i)
++  {
++	if(m_nNoiseStatus[i])
++	{
++		/*CRect rect(0,0,5-(14-m_nNoiseVolume[i])/3,m_nNoiseVolume > 0 ? 4 : 1);
++		rect.MoveToXY(92+(16-m_nNoiseStatus[i])*8,5);
++		m_memDC.FillSolidRect(rect, m_nNoiseTone[0] ? RGB(240,0,0) : RGB(0,240,0));*/
++		//status 0 is x co-ordinate 24, +16 for each 1 in status
++		//y co-ordinate is equal to i, height is 1 = bottom is top + 1
++		//width is equal to 1 per volume, increase left by volume/2, increase right by volume/2 + 1
++		//colour is 0,0,255 at left, 0,255,0 at right for tone 0, 255,0,0 at left, 0,255,0 at right for tone 1
+ 
+-  if(m_nNoiseStatus)
++		CRect rect;
++		rect.top = i*drums_speed;
++		rect.bottom = rect.top + drums_speed;
++		int width = (m_nNoiseVolume[i] + 1) / 17;
++		int middle = 8 + (m_nNoiseStatus[i])*16;
++		rect.left = middle - width/2;
++		rect.right = middle + (width+1)/2;
++		COLORREF color;
++		if (m_nNoiseTone[i] != 0)
++		{
++			if (m_nNoiseStatus[i] < 8)
+   {
+-    CRect rect(0,0,5,4);
+-    rect.MoveToXY(92+(16-m_nNoiseStatus)*8,5);
+-    m_memDC.FillSolidRect(rect, RGB(0,240,0));
++				color = RGB(255, m_nNoiseStatus[i]*16-1, 0);
+   }
+-  if(m_nDPCMStatus)
++			else
+   {
+-    CRect rect(0,0,5,4);
+-    rect.MoveToXY(92+(16-m_nDPCMStatus)*8,13);
+-    m_memDC.FillSolidRect(rect, RGB(0,240,0));
++				color = RGB(255, m_nNoiseStatus[i]*16-1, 0);
+   }
++		}
++		else
++		{
++			if (m_nNoiseStatus[i] < 8)
++			{
++				color = RGB(0, m_nNoiseStatus[i]*32-1, 255);
++			}
++			else
++			{
++				//int divisor = m_nNoiseStatus[i] > 14 ? 3 - (m_nNoiseStatus[i]-14) : 1;
++				color = RGB(m_nNoiseStatus[i] > 12 ? 63*(m_nNoiseStatus[i]-12) : 0, 255, ((16-m_nNoiseStatus[i])*31) + (m_nNoiseStatus[i] > 14 ? 80*(m_nNoiseStatus[i]-14) : 0) );
++				
++			}
++		}
++		m_memDC.FillSolidRect(rect, color);
++	}
++	if(m_nDPCMStatus[i] && m_nDPCMTone[i])
++	{
++		CRect rect;
++		rect.top = i*drums_speed;
++		rect.bottom = rect.top + drums_speed;
++		int width = 8; //(m_nDPCMVolume[i] + 1) / 17;
++		int middle = 8;
++		rect.left = middle - width/2;
++		rect.right = middle + (width+1)/2;
++		COLORREF color = RGB(((m_nDPCMTone[i])&0xFF), ((m_nDPCMTone[i]>>8)&0xF)*16, 255);
++		m_memDC.FillSolidRect(rect, color);
++	}
++  }
++
++  //move everything down by numberofframes or something
+ 
+-  m_memDC.Draw3dRect(0,0,rect.right,rect.bottom,RGB(255,255,255),RGB(128,128,128));
++  //m_memDC.Draw3dRect(0,0,rect.right,rect.bottom,RGB(255,255,255),RGB(128,128,128)); //turn back on?
+ 
+-  m_memDC.MoveTo(0,20);
+-  m_memDC.LineTo(rect.right,20);
++  //m_memDC.MoveTo(0,20);
++  //m_memDC.LineTo(rect.right,20);
+   dc.BitBlt(0,0,rect.right,rect.bottom,&m_memDC,0,0,SRCCOPY);
+ }
+diff -Bwur nsfplay23src/nsfplug_ui/KeyHeader.h nsfplay23src synthesia 0.55/nsfplug_ui/KeyHeader.h
+--- nsfplay23src/nsfplug_ui/KeyHeader.h	Mon Mar 16 10:26:22 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/KeyHeader.h	Tue Mar 17 09:10:32 2015
+@@ -1,5 +1,6 @@
+ #pragma once
+-
++#include "NSFDialog.h"
++#include "NSFTrackSetupDialog.h"
+ 
+ // KeyHeader ダイアログ
+ 
+@@ -22,15 +23,24 @@
+   // ペン
+   CPen softgray_pen;
+ 
+-  int m_nNoiseStatus;
+-  int m_nDPCMStatus;
++  int m_nNoiseStatus[10];
++  int m_nNoiseVolume[10];
++  int m_nNoiseTone[10];
++  int m_nDPCMStatus[10];
++  int m_nDPCMVolume[10];
++  int m_nDPCMTone[10];
++
++  int numberofframes;
++  int drums_speed;
+ 
+   virtual void Reset();
+ 
+   inline int MinWidth(){ return 336+1; }
+-  inline int MaxWidth(){ return 336*2+1; }
+-  inline int MinHeight(){ return 24; }
+-  inline int MaxHeight(){ return 24; }
++  inline int MaxWidth(){ return synthesiaWidth; }
++  inline int MinHeight(){ return 60; }
++  inline int MaxHeight(){ return drumsHeight; }
++  int drumsHeight;
++  int synthesiaWidth;
+ 
+ // ダイアログ データ
+ 	enum { IDD = IDD_KEYHEADER };
+diff -Bwur nsfplay23src/nsfplug_ui/KeyWindow.cpp nsfplay23src synthesia 0.55/nsfplug_ui/KeyWindow.cpp
+--- nsfplay23src/nsfplug_ui/KeyWindow.cpp	Mon Mar 16 10:26:22 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/KeyWindow.cpp	Tue Mar 17 09:10:32 2015
+@@ -4,16 +4,22 @@
+ #include "nsfplug_ui.h"
+ #include "resource.h"
+ #include "KeyWindow.h"
++#include "algorithm"
+ 
+ // KeyWindow ダイアログ
+ IMPLEMENT_DYNAMIC(KeyWindow, CDialog)
+ KeyWindow::KeyWindow(CWnd* pParent /*=NULL*/)
+ 	: CDialog(KeyWindow::IDD, pParent)
+ {
+-  m_bShowOctave = false;
++  m_bShowOctave = true;
+   m_bInit = false;
+-  for(int i=0;i<256;i++)
+-    m_nKeyStatus[i] = 0;
++  //lastnumberofframes = 1;
++  numberofframes = 1;
++  synth_speed = 1;
++  synthesiaHeight = 400;
++  synthesiaWidth = 841;
++  memset(m_nKeyStatus, 0, sizeof(m_nKeyStatus));
++  memset(m_nTrackStatus, 0, sizeof(m_nTrackStatus));
+ }
+ 
+ KeyWindow::~KeyWindow()
+@@ -29,17 +35,11 @@
+ 
+   rect.left = 0;
+   rect.top = 0;
+-  rect.right = 704;
+-  rect.bottom = 48; 
+-  pDC->FillSolidRect(&rect, RGB(0,0,0));
+-
+-  rect.left = 0;
+-  rect.top = 0;
+-  rect.right = 14*8/2*nx;
++  rect.right = 14*NUM_OCTAVES/2*nx;
+   rect.bottom = ny;
+   pDC->FillSolidRect(&rect, RGB(0,0,0));
+ 
+-  for(i=0; i<14*8; i+=2)
++  for(i=0; i<14*NUM_OCTAVES; i+=2)
+   {
+     switch(key[i%14])
+     {
+@@ -57,7 +57,7 @@
+     }
+   }
+ 
+-  for(i=0; i<14*8; i++)
++  for(i=0; i<14*NUM_OCTAVES; i++)
+   {
+     switch(key[i%14])
+     {
+@@ -77,35 +77,128 @@
+ 
+ }
+ 
++long leftfromkey(int key, int x, int nx)
++{
++	if(key&1)
++      {
++        return x + key/2*nx+nx/2 + nx/4;
++      }
++      else
++      {
++        return x + key/2*nx + nx/4;
++      }
++}
++
+ void KeyWindow::draw_notes(CDC *pDC, int x, int y, int nx, int ny)
+ {
+-  CRect rect;
+   int i;
+-  for(i=0; i<14*8; i++)
++  int j;
++  //draw notes
++  for(i=0; i<14*NUM_OCTAVES; i++)
+   {
+     if(m_nKeyStatus[i])
+     {
++	  CRect rect;
+       if(i&1)
+       {
+-        rect.left = x + i/2*nx+nx/2 + nx/4;
++        rect.left = leftfromkey(i, x, nx);
+         rect.top = y-1+ny/4;
+       }
+       else
+       {
+-        rect.left = x + i/2*nx + nx/4;
++        rect.left = leftfromkey(i, x, nx);
+         rect.top = y+4+ny*4/7;
+       }
+       rect.right = rect.left + nx/2;
+       rect.bottom = rect.top + nx/2;
+-      pDC->FillSolidRect(&rect, RGB((m_nKeyColor[i]>>16)&0xFF,(m_nKeyColor[i]>>8)&0xFF,m_nKeyColor[i]&0xFF));
++
++      pDC->FillSolidRect(&rect, RGB((m_nKeyColor[i])&0xFF,(m_nKeyColor[i]>>8)&0xFF,(m_nKeyColor[i]>>16)&0xFF));
++	}
++	
++  }
++  //draw tracks
++  for (j = 0; j < numberofframes; ++j)
++  {
++	  std::vector<int> priorities;
++	  std::vector<int>::reverse_iterator itr;
++	  for (i = 0; i < numberoftracks; ++i)
++	  {
++		//first, sort by volume
++		if (m_nTrackStatus[i][j])
++		{
++			priorities.push_back((m_nTrackVolume[i][j] << 8) + i);
++		}
++	  }
++	  //now draw from volumousmost to volumousleast
++
++	  stable_sort(priorities.begin(), priorities.end());
++	  for (itr = priorities.rbegin(); itr != priorities.rend(); ++itr)
++	  {
++		i = (*itr)&0xFF;
++		int note = (int)m_nTrackFractionalNote[i][j];
++		int tbl[12] = { 0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12 };
++	    int key = (tbl[note%12]+(note/12)*14); //insert magic here
++		int higherkey;
++		int lowerkey;
++		double interpolation = m_nTrackFractionalNote[i][j] - note;
++
++		if (interpolation > 0.5)
++		{
++			//interpolate with key to the right
++			lowerkey = key;
++			higherkey = (tbl[(note+1)%12]+((note+1)/12)*14);
++		}
++		else
++		{
++			//interpolate with key to the left
++			lowerkey = (tbl[(note-1)%12]+((note-1)/12)*14);
++			higherkey = key;
++		}
++
++		static int keys[14] = {1,2,1,2,1,0,1,2,1,2,1,2,1,0};
++		bool bothwhite = keys[lowerkey%14] == 1 && keys[higherkey%14] == 1;
++		bool higherblack = keys[lowerkey%14] == 1 && keys[higherkey%14] == 2;
++		//else lowerblack is true
++
++        int lowerleft = leftfromkey(lowerkey, x, nx);
++		int higherleft = leftfromkey(higherkey, x, nx);
++		int middleleft;
++		if (interpolation > 0.5)
++		{
++			//0.5 is full lowerleft, 1.0 is half way to higher left
++			middleleft = lowerleft + (int)((double)(higherleft - (double)lowerleft)*(interpolation-0.5));
++		}
++		else
++		{
++			//0.0 is half way to lower left, 0.5 is full higherleft
++			middleleft = lowerleft + (int)((double)(higherleft - (double)lowerleft)*(interpolation+0.5));
++		}
++	    int middleright = middleleft + nx/2;
++
++	    CRect synthesiarect;
++	    double minsizeadjust = 5.0;
++        int widthpixels = (int)((max(m_nTrackVolume[i][j]/17.0, 1.0) - minsizeadjust)*(nx/12.0));
++
++	    synthesiarect.top = ny + 1 + j*synth_speed;
++	    synthesiarect.bottom = synthesiarect.top + synth_speed;
++
++	    synthesiarect.left = middleleft-(widthpixels/2);
++	    synthesiarect.right = middleright+((widthpixels+1)/2);
++
++	    if (synthesiarect.left == synthesiarect.right) synthesiarect.right += 1;
++	  
++	    if (key&1)
++		  pDC->FillSolidRect(&synthesiarect, RGB((m_nTrackColor[i][j]&0x0000FF)>>1,(m_nTrackColor[i][j]&0x00FF00)>>9,(m_nTrackColor[i][j]&0xFF0000)>>17));
++	    else
++		  pDC->FillSolidRect(&synthesiarect, RGB((m_nTrackColor[i][j])&0xFF,(m_nTrackColor[i][j]>>8)&0xFF,(m_nTrackColor[i][j]>>16)&0xFF));
+     }
+   }
+ 
+   // オクターブ描画
+   if(m_bShowOctave)
+   {
+-    for(i=0; i<8; i++)
+-      pDC->BitBlt(x+i*7*nx+1,y+1+ny-2-6,4,5,&m_digDC,(i+1)*4,0,SRCCOPY);
++    for(i=0; i<NUM_OCTAVES; i++)
++      pDC->BitBlt(x+i*7*nx+1,y+1+ny-2-6,4,5,&m_digDC,(i)*4,0,SRCCOPY);
+   }
+ }
+ 
+@@ -117,6 +210,16 @@
+   m_nKeyColor[(tbl[note%12]+(note/12)*14)&0xFF] = color;
+ }
+ 
++void KeyWindow::TrackOn(int track, int color, int volume, double fractionalNote, int frame)
++{
++	if (fractionalNote < 1.0) return;
++	if (frame >= MAX_FRAMES) return;
++	m_nTrackStatus[track][frame] = 1;
++	m_nTrackColor[track][frame] = color;
++	m_nTrackVolume[track][frame] = volume;
++	m_nTrackFractionalNote[track][frame] = fractionalNote;
++}
++
+ void KeyWindow::KeyOff(int note)
+ {
+   int tbl[12] = { 0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12 };
+@@ -126,8 +229,14 @@
+ 
+ void KeyWindow::Reset()
+ {
+-  for(int i=0;i<256;i++)
+-    m_nKeyStatus[i]=0;
++  /*for(int i=0;i<256;i++)
++  for(int j = 0; j < MAX_FRAMES; ++j)
++  {
++    m_nKeyStatus[i][j]=0;
++  }*/
++
++  memset(m_nKeyStatus, 0, sizeof(m_nKeyStatus));
++  memset(m_nTrackStatus, 0, sizeof(m_nTrackStatus));
+ }
+ 
+ void KeyWindow::DoDataExchange(CDataExchange* pDX)
+@@ -152,16 +261,16 @@
+   m_digBitmap.LoadBitmap(IDB_DIGIT);
+   m_digDC.CreateCompatibleDC(pDC);
+   m_digDC.SelectObject(&m_digBitmap);
+-  m_keyBitmap.CreateCompatibleBitmap(pDC,MaxWidth(),MaxWidth()/14);
++  m_keyBitmap.CreateCompatibleBitmap(pDC,MaxWidth(),SynthesiaHeight()+MaxWidth()/14);
+   m_keyDC.CreateCompatibleDC(pDC);
+   m_keyDC.SelectObject(&m_keyBitmap);
+-  m_memBitmap.CreateCompatibleBitmap(pDC,MaxWidth(),MaxWidth()/14);
++  m_memBitmap.CreateCompatibleBitmap(pDC,MaxWidth(),SynthesiaHeight()+MaxWidth()/14);
+   m_memDC.CreateCompatibleDC(pDC);
+   m_memDC.SelectObject(&m_memBitmap);
+ 
+   ReleaseDC(pDC);
+   m_bInit = true;
+-  SetWindowPos(NULL,0,0,MinWidth(),24,SWP_NOMOVE|SWP_NOZORDER);
++  SetWindowPos(NULL,0,0,MinWidth(),24+SynthesiaHeight(),SWP_NOMOVE|SWP_NOZORDER);
+ 
+   return TRUE;  // return TRUE unless you set the focus to a control
+   // 例外 : OCX プロパティ ページは必ず FALSE を返します。
+@@ -173,7 +282,16 @@
+ 
+   if(m_bInit)
+   {
+-    draw_keyboard(&m_keyDC,1,0,cy/4,cy);
++	CPaintDC dc(this); // device context for painting
++	CRect rect;
++	GetClientRect(rect);
++	int keyheight = rect.Height()-SynthesiaHeight();
++	m_keyDC.FillSolidRect(0, 0, rect.Width(), keyheight+1, RGB(0, 0, 0));
++	m_memDC.FillSolidRect(0, keyheight-1, rect.Width(), SynthesiaHeight(), RGB(0, 0, 0));
++
++	cy = cy - SynthesiaHeight();
++    draw_keyboard(&m_keyDC,1,0,cy/(NUM_OCTAVES/2),cy);
++	RedrawWindow(0, 0, RDW_INVALIDATE);
+   }
+ }
+ 
+@@ -182,11 +300,31 @@
+   CPaintDC dc(this); // device context for painting
+   CRect rect;
+   GetClientRect(rect);
++  int keyheight = rect.Height()-SynthesiaHeight();
+ 
++  /*
++  m_keyDC.BitBlt(0,keyheight+(usingoldframe ? 2 : 1),rect.Width(),rect.Height(),&m_memDC,0,keyheight,SRCCOPY);
++  dc.BitBlt(0,0,rect.Width(),rect.Height(),&m_memDC,0,0,SRCCOPY);
++  m_memDC.BitBlt(0,0,rect.Width(),rect.Height(),&m_keyDC,0,0,SRCCOPY);
++  draw_notes(&m_memDC,1,0,(keyheight)/4,keyheight);
++  */
++
++  m_keyDC.BitBlt(0,keyheight+(numberofframes*synth_speed),rect.Width(),rect.Height(),&m_memDC,0,keyheight,SRCCOPY);
+   m_memDC.BitBlt(0,0,rect.Width(),rect.Height(),&m_keyDC,0,0,SRCCOPY);
+-  draw_notes(&m_memDC,1,0,rect.Height()/4,rect.Height());
++  m_memDC.FillSolidRect(0, keyheight+1, rect.Width(), numberofframes*synth_speed, RGB(0, 0, 0));
++  draw_notes(&m_memDC,1,0,(keyheight)/(NUM_OCTAVES/2),keyheight);
+   dc.BitBlt(0,0,rect.Width(),rect.Height(),&m_memDC,0,0,SRCCOPY);
+ 
++  /*
++  m_memDC.BitBlt(0,0,rect.Width(),rect.Height(),&m_keyDC,0,0,SRCCOPY);
++  m_memDC.BitBlt(0, keyheight+(usingoldframe ? 2 : 1), rect.Width(), rect.Height(), &m_keyDC, 0, keyheight, SRCCOPY);
++  m_memDC.FillSolidRect(0, keyheight+1, 0, (usingoldframe ? 2 : 1), RGB(0, 0, 0));
++  draw_notes(&m_memDC,1,0,(keyheight)/4,keyheight);
++  m_keyDC.BitBlt(0,keyheight,rect.Width(),rect.Height(),&m_memDC,0,keyheight,SRCCOPY);
++  dc.BitBlt(0,0,rect.Width(),rect.Height(),&m_memDC,0,0,SRCCOPY);*/
++
++  //lastnumberofframes = numberofframes;
++
+   // 描画メッセージで CDialog::OnPaint() を呼び出さないでください。
+ }
+ 
+diff -Bwur nsfplay23src/nsfplug_ui/KeyWindow.h nsfplay23src synthesia 0.55/nsfplug_ui/KeyWindow.h
+--- nsfplay23src/nsfplug_ui/KeyWindow.h	Mon Mar 16 10:26:22 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/KeyWindow.h	Tue Mar 17 09:10:32 2015
+@@ -21,8 +21,13 @@
+   // 全てキーオフ
+   virtual void Reset();
+ 
++  virtual void TrackOn(int track, int color, int volume, double fractionalNote, int frame);
++
+   inline int MinWidth(){ return 366+1; }
+-  inline int MaxWidth(){ return 336*2+1; }
++  inline int MaxWidth(){ return synthesiaWidth; }
++  inline int SynthesiaHeight(){ return synthesiaHeight; }
++  int synthesiaHeight;
++  int synthesiaWidth;
+ 
+   // 描画したキーボードを格納
+   CBitmap m_keyBitmap;
+@@ -36,11 +41,28 @@
+   CBitmap m_memBitmap;
+   CDC m_memDC;
+ 
++static const int MAX_FRAMES = 10;
++static const int NUM_OCTAVES = 10;
++
+   // 発音状態フラグ
+   int m_nKeyStatus[256];
+   // 発音する色
+   int m_nKeyColor[256];
+ 
++  //backside
++  int numberofframes;
++  //int lastnumberofframes;
++  int synth_speed;
++
++  static const int NES_TRACK_MAX = 31;
++
++  //xgm::ITrackInfo* m_nTrackInfo[NES_TRACK_MAX][MAX_FRAMES];
++  int m_nTrackStatus[NES_TRACK_MAX][MAX_FRAMES];
++  int m_nTrackColor[NES_TRACK_MAX][MAX_FRAMES];
++  int m_nTrackVolume[NES_TRACK_MAX][MAX_FRAMES];
++  double m_nTrackFractionalNote[NES_TRACK_MAX][MAX_FRAMES];
++  int numberoftracks;
++
+   // 初期化完了フラグ
+   bool m_bInit;
+   // オクターブガイド表示ON/OFF
+diff -Bwur nsfplay23src/nsfplug_ui/NSFDialogs.cpp nsfplay23src synthesia 0.55/nsfplug_ui/NSFDialogs.cpp
+--- nsfplay23src/nsfplug_ui/NSFDialogs.cpp	Mon Mar 16 10:26:22 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/NSFDialogs.cpp	Tue Mar 17 09:10:32 2015
+@@ -30,6 +30,7 @@
+     track = new NSFTrackDialog();
+     track->SetDialogManager(this);
+     track->Create(track->IDD);
++	OpenDialog(NSFplug_UI::DLG_TRACK);
+   }
+   memory->Create(memory->IDD);
+   memory->SetWindowPos(NULL,0,0,523,328,SWP_NOZORDER|SWP_NOMOVE);
+@@ -60,6 +61,10 @@
+   config->UpdateNSFPlayerConfig(b);
+   mask->UpdateNSFPlayerConfig(b);
+   preset->UpdateNSFPlayerConfig(b);
++  if(mode==0)
++  {
++    track->UpdateNSFPlayerConfig(b);
++  }
+ }
+ 
+ NSFDialogManager::~NSFDialogManager()
+diff -Bwur nsfplay23src/nsfplug_ui/NSFMaskDialog.cpp nsfplay23src synthesia 0.55/nsfplug_ui/NSFMaskDialog.cpp
+--- nsfplay23src/nsfplug_ui/NSFMaskDialog.cpp	Mon Mar 16 10:26:22 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/NSFMaskDialog.cpp	Tue Mar 17 09:10:32 2015
+@@ -3,6 +3,7 @@
+ 
+ #include "stdafx.h"
+ #include "NSFMaskDialog.h"
++#include "NSFDialogs.h"
+ 
+ #ifdef _DEBUG
+ #define new DEBUG_NEW
+@@ -27,6 +28,8 @@
+ 	m_fme7_1 = FALSE;
+ 	m_fme7_2 = FALSE;
+ 	m_fme7_3 = FALSE;
++    //m_fme7_4 = FALSE;
++	//m_fme7_5 = FALSE;
+ 	m_mmc5_1 = FALSE;
+ 	m_mmc5_2 = FALSE;
+ 	m_mmc5_3 = FALSE;
+@@ -69,23 +72,25 @@
+     m_fme7_1= (int)CONFIG["MASK"]&0x00000200?false:true;
+     m_fme7_2= (int)CONFIG["MASK"]&0x00000400?false:true;
+     m_fme7_3= (int)CONFIG["MASK"]&0x00000800?false:true;
+-    m_vrc6_1= (int)CONFIG["MASK"]&0x00001000?false:true;
+-    m_vrc6_2= (int)CONFIG["MASK"]&0x00002000?false:true;
+-    m_vrc6_3= (int)CONFIG["MASK"]&0x00004000?false:true;
+-    m_vrc7_1= (int)CONFIG["MASK"]&0x00008000?false:true;
+-    m_vrc7_2= (int)CONFIG["MASK"]&0x00010000?false:true;
+-    m_vrc7_3= (int)CONFIG["MASK"]&0x00020000?false:true;
+-    m_vrc7_4= (int)CONFIG["MASK"]&0x00040000?false:true;
+-    m_vrc7_5= (int)CONFIG["MASK"]&0x00080000?false:true;
+-    m_vrc7_6= (int)CONFIG["MASK"]&0x00100000?false:true;
+-    m_n106_1= (int)CONFIG["MASK"]&0x00200000?false:true;
+-    m_n106_2= (int)CONFIG["MASK"]&0x00400000?false:true;
+-    m_n106_3= (int)CONFIG["MASK"]&0x00800000?false:true;
+-    m_n106_4= (int)CONFIG["MASK"]&0x01000000?false:true;
+-    m_n106_5= (int)CONFIG["MASK"]&0x02000000?false:true;
+-    m_n106_6= (int)CONFIG["MASK"]&0x04000000?false:true;
+-    m_n106_7= (int)CONFIG["MASK"]&0x08000000?false:true;
+-    m_n106_8= (int)CONFIG["MASK"]&0x10000000?false:true; 
++  //m_fme7_4= (int)CONFIG["MASK"]&0x00001000?false:true;
++  //m_fme7_5= (int)CONFIG["MASK"]&0x00002000?false:true;
++    m_vrc6_1= (int)CONFIG["MASK"]&0x00004000?false:true;
++    m_vrc6_2= (int)CONFIG["MASK"]&0x00008000?false:true;
++    m_vrc6_3= (int)CONFIG["MASK"]&0x00010000?false:true;
++    m_vrc7_1= (int)CONFIG["MASK"]&0x00020000?false:true;
++    m_vrc7_2= (int)CONFIG["MASK"]&0x00040000?false:true;
++    m_vrc7_3= (int)CONFIG["MASK"]&0x00080000?false:true;
++    m_vrc7_4= (int)CONFIG["MASK"]&0x00100000?false:true;
++    m_vrc7_5= (int)CONFIG["MASK"]&0x00200000?false:true;
++    m_vrc7_6= (int)CONFIG["MASK"]&0x00400000?false:true;
++    m_n106_1= (int)CONFIG["MASK"]&0x00800000?false:true;
++    m_n106_2= (int)CONFIG["MASK"]&0x01000000?false:true;
++    m_n106_3= (int)CONFIG["MASK"]&0x02000000?false:true;
++    m_n106_4= (int)CONFIG["MASK"]&0x04000000?false:true;
++    m_n106_5= (int)CONFIG["MASK"]&0x08000000?false:true;
++    m_n106_6= (int)CONFIG["MASK"]&0x10000000?false:true;
++    m_n106_7= (int)CONFIG["MASK"]&0x20000000?false:true;
++    m_n106_8= (int)CONFIG["MASK"]&0x40000000?false:true; 
+     if (m_hWnd) UpdateData(false);
+   }
+   else if(m_hWnd)
+@@ -103,26 +108,31 @@
+                (!m_fme7_1<<9) |
+                (!m_fme7_2<<10) |
+                (!m_fme7_3<<11) |
+-               (!m_vrc6_1<<12) |
+-               (!m_vrc6_2<<13) |
+-               (!m_vrc6_3<<14) |
+-               (!m_vrc7_1<<15) |
+-               (!m_vrc7_2<<16) |
+-               (!m_vrc7_3<<17) |
+-               (!m_vrc7_4<<18) |
+-               (!m_vrc7_5<<19) |
+-               (!m_vrc7_6<<20) |
+-               (!m_n106_1<<21) |
+-               (!m_n106_2<<22) |
+-               (!m_n106_3<<23) |
+-               (!m_n106_4<<24) |
+-               (!m_n106_5<<25) |
+-               (!m_n106_6<<26) |
+-               (!m_n106_7<<27) |
+-               (!m_n106_8<<28);
++			   //(!m_fme7_4<<12) |
++               //(!m_fme7_5<<13) |
++               (!m_vrc6_1<<14) |
++               (!m_vrc6_2<<15) |
++               (!m_vrc6_3<<16) |
++               (!m_vrc7_1<<17) |
++               (!m_vrc7_2<<18) |
++               (!m_vrc7_3<<19) |
++               (!m_vrc7_4<<20) |
++               (!m_vrc7_5<<21) |
++               (!m_vrc7_6<<22) |
++               (!m_n106_1<<23) |
++               (!m_n106_2<<24) |
++               (!m_n106_3<<25) |
++               (!m_n106_4<<26) |
++               (!m_n106_5<<27) |
++               (!m_n106_6<<28) |
++               (!m_n106_7<<29) |
++               (!m_n106_8<<30);
+     pm->cf->Notify(-1);
++	parent->UpdateNSFPlayerConfig(true);
+   }
+ 
++
++
+   if((int)CONFIG["MASK"]==0)
+     m_reset.EnableWindow(false);
+   else
+diff -Bwur nsfplay23src/nsfplug_ui/NSFTrackDialog.cpp nsfplay23src synthesia 0.55/nsfplug_ui/NSFTrackDialog.cpp
+--- nsfplay23src/nsfplug_ui/NSFTrackDialog.cpp	Mon Mar 16 10:26:23 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/NSFTrackDialog.cpp	Tue Mar 17 09:30:49 2015
+@@ -5,6 +5,7 @@
+ #include "nsfplug_ui.h"
+ #include "NSFDialogs.h"
+ #include "NSFTrackDialog.h"
++#include "math.h"
+ 
+ // color reader
+ int read_color(const char* c)
+@@ -35,9 +36,10 @@
+ NSFTrackDialog::NSFTrackDialog(CWnd* pParent /*=NULL*/)
+ 	: CDialog(NSFTrackDialog::IDD, pParent)
+ {
++  frame_of_last_update = -1;
+   m_active = false;
+-  for(int i=0;i<NSFPlayer::NES_TRACK_MAX;i++)
+-    m_showtrk[i]=true;
++/*  for(int i=0;i<NSFPlayer::NES_TRACK_MAX;i++)
++    m_showtrk[i]=true;*/
+ 
+   green_pen.CreatePen(PS_SOLID,1,RGB(0,212,0));
+   m_pDCtrk = NULL;
+@@ -60,17 +62,25 @@
+   {
+     m_setup.m_freq_value   = CONFIG["INFO_FREQ"];
+     m_setup.m_delay_value  = CONFIG["INFO_DELAY"];
+-    m_speed.SetPos( 256 / CONFIG["MULT_SPEED"] );
++    m_speed.SetPos((256 / (CONFIG["MULT_SPEED"]/8)) - 7);
+     m_setup.m_freq_mode    = !(int)CONFIG["FREQ_MODE"];
+     m_setup.m_graphic_mode = !(int)CONFIG["GRAPHIC_MODE"];
++	m_setup.m_synth_speed_value = CONFIG["SYNTH_SPEED"];
++	m_setup.m_drums_speed_value = CONFIG["DRUMS_SPEED"];
++    for(int trk=0;trk<m_maxtrk;trk++)
++	{
++        m_trkinfo.SetCheck(trk,( (CONFIG["MASK"]>>m_trkmap[trk])&0x1) == 0 ? true : false);
++	}
+   }
+   else
+   {
+     CONFIG["INFO_FREQ"]    = m_setup.m_freq_value;
+     CONFIG["INFO_DELAY"]   = m_setup.m_delay_value;
+-    CONFIG["MULT_SPEED"]   = 256 / m_speed.GetPos();
++    CONFIG["MULT_SPEED"]   = (256 / (m_speed.GetPos()+7))*8;
+     CONFIG["FREQ_MODE"]    = !m_setup.m_freq_mode;
+     CONFIG["GRAPHIC_MODE"] = !m_setup.m_graphic_mode;
++	CONFIG["SYNTH_SPEED"] = m_setup.m_synth_speed_value;
++	CONFIG["DRUMS_SPEED"] = m_setup.m_drums_speed_value;
+   }
+ }
+ 
+@@ -120,16 +130,26 @@
+ 
+ static int keyColMap[NSFPlayer::NES_TRACK_MAX] =
+ {
+-  0xFF0000, 0xFF0000, //APU1
++  0x0000FF, 0x0000FF, //APU1
+   0x00FF00, 0x00FF00, 0x000000, //APU2
+-  0x0080FF, //FDS
+-  0xFFC000, 0xFFC000, 0x000000, //MMC5
+-  0x0000FF, 0x0000FF, 0x0000FF, 0x0000FF, 0x000000, //FME7
+-  0xFF8000, 0xFF8000, 0xFF8000, //VRC6
+-  0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF,//VRC7
+-  0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080  //N106
++  0xFF8000, //FDS
++  0x00C0FF, 0x00C0FF, 0x000000, //MMC5
++  0xFF0000, 0xFF0000, 0xFF0000, 0xFF0000, 0x000000, //FME7
++  0x0080FF, 0x0080FF, 0x0080FF, //VRC6
++  0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080,//VRC7
++  0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF  //N106
+ };
+ 
++int ms_to_frame(int time_in_ms, int fps)
++{
++	return (int)((double)time_in_ms * ((double)fps / 1000.0));
++}
++
++int frame_to_ms(int time_in_frames, int fps)
++{
++	return (int)((double)time_in_frames * (1000.0 / (double)fps));
++}
++
+ void NSFTrackDialog::OnTimer(UINT nIDEvent)
+ {
+   __super::OnTimer(nIDEvent);
+@@ -142,14 +162,19 @@
+   {
+     int time_in_ms;
+     time_in_ms = parent->wa2mod->GetOutputTime();
++	m_keydlg.m_keywindow.synth_speed = CONFIG["SYNTH_SPEED"];
++    m_keydlg.m_keyheader.drums_speed = CONFIG["DRUMS_SPEED"];
++	int delay = (int)CONFIG["INFO_DELAY"];
++	int time_in_ms_with_delay = time_in_ms-delay;
++	int current_frame = ms_to_frame(time_in_ms_with_delay, 60);
+     
+     if(nIDEvent==2)
+     {
+       for(int trk=0;trk<m_maxtrk;trk++)
+       {
+         ITrackInfo *ti;
+-        int delay = (int)CONFIG["INFO_DELAY"];
+-        ti = dynamic_cast<ITrackInfo *>(pm->pl->GetInfo(time_in_ms-delay, m_trkmap[trk]));
++        
++        ti = dynamic_cast<ITrackInfo *>(pm->pl->GetInfo(frame_to_ms(current_frame, 60), m_trkmap[trk]));
+ 
+         if(ti)
+         {
+@@ -167,11 +192,20 @@
+         }
+       }
+     }
+-    else if(nIDEvent==1)
++    else if(nIDEvent==1 && current_frame != frame_of_last_update)
+     {
+       m_keydlg.Reset();
+       for(int trk=0;trk<m_maxtrk;trk++)
+       {
++		//update channel mask
++	    /*if (m_trkinfo.GetCheck(trk))
++		{
++            CONFIG["MASK"] = CONFIG["MASK"]|(1<<m_trkmap[trk]);
++		}
++		else
++		{
++            CONFIG["MASK"] = CONFIG["MASK"]&(~(1<<m_trkmap[trk]));
++		}*/
+         ITrackInfo *ti;
+         int delay = (int)CONFIG["INFO_DELAY"];
+         ti = dynamic_cast<ITrackInfo *>(pm->pl->GetInfo(time_in_ms-delay, m_trkmap[trk]));
+@@ -256,11 +290,32 @@
+           if(m_trkinfo.GetCheck(trk)&&(ti->GetKeyStatus()||m_keepkey[m_trkmap[trk]]))
+           {
+             if(m_trkmap[trk]==NSFPlayer::APU2_TRK1)
+-              m_keydlg.m_keyheader.m_nNoiseStatus = (ti->GetFreq()&0xF)+1;
++			{
++              m_keydlg.m_keyheader.m_nNoiseStatus[0] = 16-(ti->GetFreq()&0xF);
++			  m_keydlg.m_keyheader.m_nNoiseVolume[0] = (255*(ti->GetVolume()&0xF) / ti->GetMaxVolume());
++			  m_keydlg.m_keyheader.m_nNoiseTone[0] = (ti->GetTone());
++			}
+             else if(m_trkmap[trk]==NSFPlayer::APU2_TRK2)
+-              m_keydlg.m_keyheader.m_nDPCMStatus = (ti->GetFreq()&0xF)+1;
++			{
++              m_keydlg.m_keyheader.m_nDPCMStatus[0] = (ti->GetFreq()&0xF)+1;
++			  m_keydlg.m_keyheader.m_nDPCMVolume[0] = (255*(ti->GetVolume()&0xF) / ti->GetMaxVolume());
++			  m_keydlg.m_keyheader.m_nDPCMTone[0] = (ti->GetTone());
++			}
++            else if(m_trkmap[trk] == NSFPlayer::APU1_TRK0 || m_trkmap[trk] == NSFPlayer::APU1_TRK1)
++			{
++			  int volume = 255*(ti->GetVolume()&0xF) / ti->GetMaxVolume();
++              m_keydlg.m_keywindow.KeyOn(key-12*3, keyColMap[m_trkmap[trk]]);
++			  m_keydlg.m_keywindow.TrackOn(trk, ColorForNote(ti, trk), volume, ti->GetFractionalNote(ti->GetFreqHz())-12*3, 0);
++			}
+             else
+-            m_keydlg.m_keywindow.KeyOn(key-12*4, keyColMap[m_trkmap[trk]]);
++			{
++              int volume = m_trkmap[trk] == NSFPlayer::VRC6_TRK2 ? min(ti->GetVolume()*8, 255) : (255*ti->GetVolume() / ti->GetMaxVolume());
++			  if (volume > 0 || m_trkmap[trk] == NSFPlayer::APU2_TRK0)
++			  {
++            m_keydlg.m_keywindow.KeyOn(key-12*3, keyColMap[m_trkmap[trk]]);
++			     m_keydlg.m_keywindow.TrackOn(trk, ColorForNote(ti, trk), volume, ti->GetFractionalNote(ti->GetFreqHz())-12*3, 0);
++			  }
++			}
+           }
+ 
+           // 音色表示
+@@ -366,14 +421,14 @@
+                 m_pDCtrk->FillSolidRect(rect,RGB(0,0,0));
+                 rect.bottom -=1;
+                 int length = min(dynamic_cast<TrackInfoN106 *>(ti)->wavelen, rect.Width());
+-                m_pDCtrk->MoveTo(rect.left,rect.bottom);
+-                m_pDCtrk->LineTo(rect.left+length,rect.bottom);
+                 if (ti->GetVolume() == 0 && length >= 128)
+                 {
+                     // hide waves that are muted and long
+                     // (engines frequently wipe most or all of the length register when muted)
+                     length = 0;
+                 }
++                m_pDCtrk->MoveTo(rect.left,rect.bottom);
++                m_pDCtrk->LineTo(rect.left+length,rect.bottom);
+                 for(i=0;i<length;i++)
+                 {
+                   m_pDCtrk->MoveTo(rect.left+i, rect.bottom); 
+@@ -393,10 +448,420 @@
+             m_trkinfo.SetItem(trk,i,LVIF_TEXT,"",0,0,0,0);
+         }
+       }
++
++	  if (current_frame - frame_of_last_update > 1) //we missed a frame
++	  {
++		  int frames_needed = min(current_frame - frame_of_last_update, KeyWindow::MAX_FRAMES);
++
++		  //also fill in old buffer
++		  m_keydlg.m_keywindow.numberofframes = frames_needed;
++		  m_keydlg.m_keyheader.numberofframes = frames_needed;
++		  //d-d-d-doubled logic
++
++		  for(int trk=0;trk<m_maxtrk;trk++)
++		  for (int j = 1; j < frames_needed; ++j)
++		  {
++			ITrackInfo *ti;
++			int delay = (int)CONFIG["INFO_DELAY"];
++			ti = dynamic_cast<ITrackInfo *>(pm->pl->GetInfo(frame_to_ms(current_frame - (j), 60)+1, m_trkmap[trk]));
++
++			if(ti)
++			{
++				int i;
++				CString str;
++				CRect rect;
++
++				// 音量表示
++				int vol = ti->GetVolume();
++          
++				int key = ti->GetNote(ti->GetFreqHz());
++
++				if(m_trkinfo.GetCheck(trk)&&(ti->GetKeyStatus()||m_keepkey[m_trkmap[trk]]))
++				{
++					if(m_trkmap[trk]==NSFPlayer::APU2_TRK1)
++					{
++						m_keydlg.m_keyheader.m_nNoiseStatus[j] = 16-(ti->GetFreq()&0xF);
++						m_keydlg.m_keyheader.m_nNoiseVolume[j] = (255*(ti->GetVolume()&0xF) / ti->GetMaxVolume());
++						m_keydlg.m_keyheader.m_nNoiseTone[j] = (ti->GetTone());
++    }
++					else if(m_trkmap[trk]==NSFPlayer::APU2_TRK2)
++					{
++						m_keydlg.m_keyheader.m_nDPCMStatus[j] = (ti->GetFreq()&0xF)+1;
++						m_keydlg.m_keyheader.m_nDPCMVolume[j] = (255*(ti->GetVolume()&0xF) / ti->GetMaxVolume());
++						m_keydlg.m_keyheader.m_nDPCMTone[j] = (ti->GetTone());
++					}
++					else if(m_trkmap[trk] == NSFPlayer::APU1_TRK0 || m_trkmap[trk] == NSFPlayer::APU1_TRK1)
++			        {
++			            int volume = 255*(ti->GetVolume()&0xF) / ti->GetMaxVolume();
++                        m_keydlg.m_keywindow.KeyOn(key-12*3, keyColMap[m_trkmap[trk]]);
++			            m_keydlg.m_keywindow.TrackOn(trk, ColorForNote(ti, trk), volume, ti->GetFractionalNote(ti->GetFreqHz())-12*3, j);
++    }
++			        else
++			        {
++                       int volume = m_trkmap[trk] == NSFPlayer::VRC6_TRK2 ? min(ti->GetVolume()*8, 255) : (255*ti->GetVolume() / ti->GetMaxVolume());
++					   if (volume > 0 || m_trkmap[trk] == NSFPlayer::APU2_TRK0)
++					   {
++                           m_keydlg.m_keywindow.KeyOn(key-12*3, keyColMap[m_trkmap[trk]]);
++			               m_keydlg.m_keywindow.TrackOn(trk, ColorForNote(ti, trk), volume, ti->GetFractionalNote(ti->GetFreqHz())-12*3, j);
++					   }
+     }
+   }
++    }
++  }
++  }
++	  else
++	  {
++		  //notify only newest buffer relevant
++		  m_keydlg.m_keywindow.numberofframes = 1;
++		  m_keydlg.m_keyheader.numberofframes = 1;
++	  }
++
++	frame_of_last_update = current_frame;
++
++	m_keydlg.OnTimer(nIDEvent);
++  }
++
++  }
+ 
+   LeaveCriticalSection(&parent->cso);
++
++ 
++}
++
++#define DESATURATE_MAX 255
++//desaturate towards white
++static COLORREF RGBdesaturate(byte r, byte g, byte b, int desaturateamount)
++{
++	if (r > g && r > b)
++	{
++		g = g + ((255-g)*desaturateamount)/DESATURATE_MAX;
++		b = b + ((255-b)*desaturateamount)/DESATURATE_MAX;
++	}
++	else if (b > r && b > g)
++	{
++		r = r + ((255-r)*desaturateamount)/DESATURATE_MAX;
++		g = g + ((255-g)*desaturateamount)/DESATURATE_MAX;
++	}
++	else
++	{
++		r = r + ((255-r)*desaturateamount)/DESATURATE_MAX;
++		b = b + ((255-b)*desaturateamount)/DESATURATE_MAX;
++	}
++	return RGB(r, g, b);
++}
++
++//desaturate towards gray
++static COLORREF RGBgrayify(byte r, byte g, byte b, int grayamount)
++{
++	r = r*(255-grayamount)/DESATURATE_MAX + 127*grayamount/DESATURATE_MAX;
++	g = g*(255-grayamount)/DESATURATE_MAX + 127*grayamount/DESATURATE_MAX;
++	b = b*(255-grayamount)/DESATURATE_MAX + 127*grayamount/DESATURATE_MAX;
++	return RGB(r, g, b);
++}
++
++COLORREF NSFTrackDialog::ColorForNote(xgm::ITrackInfo *ti, int trk)
++{
++	//int vol = (255*ti->GetVolume() / ti->GetMaxVolume());
++	int tone = ti->GetTone();
++	COLORREF result; //= RGB(240, 120, 120);
++	int desaturateamount;
++	switch(m_trkmap[trk])
++	{
++		case NSFPlayer::APU1_TRK0:
++        case NSFPlayer::APU1_TRK1:
++		case NSFPlayer::MMC5_TRK0:
++		case NSFPlayer::MMC5_TRK1:
++		case NSFPlayer::MMC5_TRK2:
++			switch (tone)
++			{
++				case 0:
++					result = RGB(240, 0, 0);
++				break;
++				case 1:
++					result = RGB(240, 240, 0);
++				break;
++				case 2:
++					result = RGB(120, 0, 240);
++				break;
++				case 3:
++					result = RGB(240, 240, 0);
++				break;
++			}
++		break;
++		case NSFPlayer::VRC6_TRK0:
++		case NSFPlayer::VRC6_TRK1:
++			switch (tone)
++			{
++				case 0:
++					result = RGB(240, 0, 120);
++				break;
++				case 1:
++					result = RGB(240, 0, 0);
++				break;
++				case 2:
++					result = RGB(240, 120, 0);
++				break;
++				case 3:
++					result = RGB(240, 240, 0);
++				break;
++				case 4:
++					result = RGB(0, 240, 0);
++				break;
++				case 5:
++					result = RGB(0, 240, 240);
++				break;
++				case 6:
++					result = RGB(0, 0, 240);
++				break;
++				case 7:
++					result = RGB(120, 0, 240);
++				break;
++			}
++		break;
++		case NSFPlayer::APU2_TRK0:
++			result = RGB(240, 240, 240);
++		break;
++		case NSFPlayer::VRC7_TRK0:
++		case NSFPlayer::VRC7_TRK1:
++		case NSFPlayer::VRC7_TRK2:
++		case NSFPlayer::VRC7_TRK3:
++		case NSFPlayer::VRC7_TRK4:
++		case NSFPlayer::VRC7_TRK5:
++			desaturateamount = (ti->GetMisc())&0xFF;
++			desaturateamount = desaturateamount*DESATURATE_MAX/12;
++			switch ((int)(0.0001+(tone / 42.51)))
++			{
++				//0 magenta, 42 blue
++				case 0:
++					result = RGBgrayify(255-tone*6,0,255, desaturateamount);
++				break;
++				//43 blue, 85 cyan
++				case 1:
++					result = RGBgrayify(0,(tone-43)*6,255, desaturateamount);
++				break;
++				//86 cyan, 127 green
++				case 2:
++					result = RGBgrayify(0,255,255-(tone-86)*6, desaturateamount);
++				break;
++				//128 green, 169 yellow
++				case 3:
++					result = RGBgrayify((tone-128)*6,255,0, desaturateamount);
++				break;
++				//170 yellow, 212 orange
++				case 4:
++					result = RGBgrayify(255,255-(tone-170)*3,0, desaturateamount);
++				break;
++				//213 orange, 255 red
++				case 5:
++					result = RGBgrayify(255,128-(tone-213)*3,0, desaturateamount);
++				break;
++			}
++		break;
++		case NSFPlayer::FDS_TRK0:
++			result = ColorForWave(64, (static_cast<TrackInfoFDS *>(ti)->wave));
++		break;
++		case NSFPlayer::N106_TRK0:
++		case NSFPlayer::N106_TRK1:
++		case NSFPlayer::N106_TRK2:
++		case NSFPlayer::N106_TRK3:
++		case NSFPlayer::N106_TRK4:
++		case NSFPlayer::N106_TRK5:
++		case NSFPlayer::N106_TRK6:
++		case NSFPlayer::N106_TRK7:
++			result = ColorForWave((static_cast<TrackInfoN106 *>(ti)->wavelen), (static_cast<TrackInfoN106 *>(ti)->wave));
++		break;
++		case NSFPlayer::FME7_TRK0:
++		case NSFPlayer::FME7_TRK1:
++		case NSFPlayer::FME7_TRK2:
++			return RGB(120, 0, 240);
++		break;
++		case NSFPlayer::FME7_TRK3: //env
++
++			if ((static_cast<TrackInfoN106 *>(ti)->tone)&8 > 0 && (static_cast<TrackInfoN106 *>(ti)->tone)&2 > 0 && (static_cast<TrackInfoN106 *>(ti)->tone)&1 == 0) //triangle wave
++			{
++				result = RGB(240, 240, 240);
++			}
++			else
++			{
++				result = RGB(240, 120, 120);
++			}
++		break;
++		case NSFPlayer::FME7_TRK4: //noise
++			result = RGB(180, 240, 180);
++		break;
++		break;
++		default:
++			result = RGB(240, 120, 120);
++		break;
++	}
++	return result;
++}
++
++COLORREF NSFTrackDialog::ColorForWave(int wavelen, xgm::INT16 wave[])
++{
++	const COLORREF tricolor = RGB(240, 240, 240);
++	const COLORREF sinecolor = RGB(240, 0, 240);
++
++	//triangle wave check
++	const xgm::INT16 tri_64_fds[64] = { -32, -30, -28, -26, -24, -22, -20, -18, -16, -14, -12, -10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0, -2, -4, -6, -8, -10, -12, -14, -16, -18, -20, -22, -24, -26, -28, -30, -32};
++	const xgm::INT16 tri_32_n106[32] = { -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7, -8};
++	const xgm::INT16 tri_16_n106[16] = { -8, -6, -4, -2, 0, 2, 4, 6, 6, 4, 2, 0, -2, -4, -6, -8};
++	const xgm::INT16 tri_8_n106[8] = { -8, -4, 0, 4, 4, 0, -4, -8};
++
++	//sine wave check
++	const xgm::INT16 sine_64_fds[64] = { 1, 4, 7, 10, 13, 16, 18, 21, 23, 25, 27, 28, 29, 30, 31, 31, 31, 31, 30, 29, 28, 27, 25, 23, 21, 18, 16, 13, 10, 7, 4, 1, -2, -5, -8, -11, -14, -17, -19, -22, -24, -26, -28, -29, -30, -31, -32, -32, -32, -32, -31, -30, -29, -28, -26, -24, -22, -19, -17, -14, -11, -8, -5, -2};
++	const xgm::INT16 sine_32_n106[32] = { 0, 1, 3, 4, 5, 6, 7, 7, 7, 7, 6, 6, 5, 3, 2, 1, -1, -2, -4, -5, -6, -7, -8, -8, -8, -8, -7, -7, -6, -4, -3, -2};
++	const xgm::INT16 sine_16_n106[16] = { 0, 3, 5, 7, 7, 6, 5, 2, -1, -4, -6, -8, -8, -7, -6, -3};
++	const xgm::INT16 sine_8_n106[8] = { 0, 5, 7, 5, -1, -6, -8, -6};
++
++	if (wavelen == 8)
++	{
++		if (memcmp(wave, tri_8_n106, sizeof(xgm::INT16)*wavelen) == 0)
++		{
++			return tricolor;
++		}
++		else if (memcmp(wave, sine_8_n106, sizeof(xgm::INT16)*wavelen) == 0)
++		{
++			return sinecolor;
++		}
++	}
++	else if (wavelen == 16)
++	{
++		if (memcmp(wave, tri_16_n106, sizeof(xgm::INT16)*wavelen) == 0)
++		{
++			return tricolor;
++		}
++		else if (memcmp(wave, sine_16_n106, sizeof(xgm::INT16)*wavelen) == 0)
++		{
++			return sinecolor;
++		}
++	}
++	else if (wavelen == 32) //largest 2a03
++	{
++		if (memcmp(wave, tri_32_n106, sizeof(xgm::INT16)*wavelen) == 0)
++		{
++			return tricolor;
++		}
++		else if (memcmp(wave, sine_32_n106, sizeof(xgm::INT16)*wavelen) == 0)
++		{
++			return sinecolor;
++		}
++	}
++	else if (wavelen == 64) //fds
++	{
++		if (memcmp(wave, tri_64_fds, sizeof(xgm::INT16)*wavelen) == 0)
++		{
++			return tricolor;
++		}
++		else if (memcmp(wave, sine_64_fds, sizeof(xgm::INT16)*wavelen) == 0)
++		{
++			return sinecolor;
++		}
++	}
++
++	//square wave check
++	const int TOLERANCE = 4;
++
++	int leftstart = wave[0];
++	int rightstart = wave[wavelen-1];
++	int leftlength = 1;
++	int rightlength = 1;
++	int leftlargestdifference = 0;
++	int rightlargestdifference = 0;
++	for (int i = 1; i < wavelen; ++i)
++	{
++		int diff = abs(wave[i] - leftstart);
++		if (diff < TOLERANCE)
++		{
++			leftlength++;
++			if (diff > leftlargestdifference)
++			{
++				leftlargestdifference = diff;
++			}
++		}
++		else
++		{
++			break;
++		}
++	}
++
++	for (int i = wavelen-2; i > -1; --i)
++	{
++		int diff = abs(wave[i] - rightstart);
++		if (diff < TOLERANCE)
++		{
++			rightlength++;
++			if (diff > rightlargestdifference)
++			{
++				rightlargestdifference = diff;
++			}
++		}
++		else
++		{
++			break;
++		}
++	}
++
++	if (leftlength > wavelen/2 && rightlength > wavelen/2) //not a wave at all!
++	{
++		return RGB(40, 40, 40); //black
++	}
++	else if(leftlength < wavelen/2-1 && rightlength < wavelen/2-1) //not a square wave, triangle wave or sine wave
++	{
++		//note: as coded this means that as long as one side of the wave reaches past the midpoint, it's considered a square wave
++		return RGB(240, 120, 120); //pink
++	}
++	else
++	{
++		double dutycycle = (double)(wavelen-max(leftlength, rightlength)) / (double)wavelen;
++		double dutycycleremainder = dutycycle*16 - (int)(dutycycle*16);
++		//same as VRC6, so:
++		//RGB(120,	0,	240) at 8/16
++		//RGB(0,	0,	240) at 7/16
++		//RGB(0,	240,240) at 6/16
++		//RGB(0,	240,0) at 5/16
++		//RGB(240,	240,0) at 4/16
++		//RGB(240,	120,0) at 3/16
++		//RGB(240,	0,	0) at 2/16
++		//RGB(240,	0,	120) at 1/16
++		//RGB(240,	0,	240) at 0/16
++
++		//add saturation based on how bad of a match it was
++		int desaturateamount = (leftlargestdifference + rightlargestdifference+max(wavelen-leftlength-rightlength, 2))*DESATURATE_MAX/((TOLERANCE+1)*2);
++		switch ((int)(dutycycle*16))
++		{
++			case 0:
++				return RGBgrayify(240, 0, 240-120*dutycycleremainder, desaturateamount);
++			break;
++			case 1:
++				return RGBgrayify(240, 0, 120-120*dutycycleremainder, desaturateamount);
++			break;
++			case 2:
++				return RGBgrayify(240, 120*dutycycleremainder, 0, desaturateamount);
++			break;
++			case 3:
++				return RGBgrayify(240, 120+120*dutycycleremainder, 0, desaturateamount);
++			break;
++			case 4:
++				return RGBgrayify(240-240*dutycycleremainder, 240, 0, desaturateamount);
++			break;
++			case 5:
++				return RGBgrayify(0, 240, 240*dutycycleremainder, desaturateamount);
++			break;
++			case 6:
++				return RGBgrayify(0, 240-240*dutycycleremainder, 240, desaturateamount);
++			break;
++			case 7:
++				return RGBgrayify(120*dutycycleremainder, 0, 240, desaturateamount);
++			break;
++			case 8:
++				return RGBgrayify(120, 0, 240, desaturateamount);
++			break;
++			default:
++				return RGB(128, 255, 128); //should never happen
++			break;
++		}
++	}
+ }
+ 
+ void NSFTrackDialog::InitList()
+@@ -448,11 +913,12 @@
+         continue;
+       }
+       m_trkinfo.InsertItem(idx,tname[i][j]);
+-      m_trkinfo.SetCheck(idx,m_showtrk[num-1]);
++	  m_trkinfo.SetCheck(idx,( (CONFIG["MASK"]>>m_trkmap[idx])&0x1) == 0 ? true : false);
+       idx++;
+     }
+   }
+   m_maxtrk = idx;
++  m_keydlg.m_keywindow.numberoftracks = m_maxtrk;
+   m_initializing_list = false;
+ 
+ }
+@@ -464,7 +930,7 @@
+   if(m_keydlg.m_hWnd&&m_trkinfo.m_hWnd)
+   {
+     GetClientRect(&rect_c);
+-    rect2.SetRect(0, 0, rect_c.Width(), (rect_c.Width()/14)+m_keydlg.m_keyheader.MinHeight());
++    rect2.SetRect(0, 0, rect_c.Width(), (rect_c.Width()/14)+m_keydlg.m_keyheader.MaxHeight()+m_keydlg.SynthesiaHeight());
+     rect2.MoveToXY(0, rect_c.bottom-rect2.Height());
+     m_keydlg.MoveWindow(&rect2);
+ 
+@@ -479,6 +945,14 @@
+ 
+ BOOL NSFTrackDialog::OnInitDialog()
+ {
++  m_keydlg.m_keywindow.synthesiaWidth = CONFIG["SYNTHESIA_WIDTH"];
++  m_keydlg.m_keywindow.synthesiaHeight = CONFIG["SYNTHESIA_HEIGHT"];
++  m_keydlg.m_keyheader.synthesiaWidth = CONFIG["SYNTHESIA_WIDTH"]; 
++  m_keydlg.m_keyheader.drumsHeight = CONFIG["DRUMS_HEIGHT"];
++  //m_keydlg.m_keywindow.OnInitDialog();
++  //m_keydlg.m_keyheader.OnInitDialog();
++  
++
+   __super::OnInitDialog();
+ 
+   HICON hIcon = AfxGetApp()->LoadIcon(IDI_NSF);
+@@ -488,7 +962,7 @@
+ 
+   m_pDCtrk = m_trkinfo.GetDC();
+   for(int i=0; cname[i]!=NULL; i++)
+-    m_trkinfo.InsertColumn(i,cname[i],(i==0||i==6)?LVCFMT_LEFT:LVCFMT_RIGHT,i==6?68:m_pDCtrk->GetTextExtent(cname[i]).cx+12+(i?0:12),i);
++    m_trkinfo.InsertColumn(i,cname[i],(i==0||i==6)?LVCFMT_LEFT:LVCFMT_RIGHT,i==6?256:m_pDCtrk->GetTextExtent(cname[i]).cx+12+(i?0:12),i);
+   m_trkinfo.SetExtendedStyle(LVS_EX_CHECKBOXES|LVS_EX_HEADERDRAGDROP|LVS_EX_DOUBLEBUFFER);
+   m_trkinfo.SetBkColor(RGB(0,0,0));
+   m_trkinfo.SetTextColor(RGB(0,212,0));
+@@ -497,8 +971,8 @@
+   m_keydlg.Create(m_keydlg.IDD,this);
+   m_keydlg.ShowWindow(SW_SHOW);
+ 
+-  m_speed.SetRange(1,8);
+-  m_speed.SetTicFreq(1);
++  m_speed.SetRange(1,41);
++  m_speed.SetTicFreq(4);
+   m_speed.SetPageSize(1);
+   m_speed.SetLineSize(1);
+ 
+@@ -507,10 +981,12 @@
+   GetWindowRect(&rect2);
+   int min_height = rect2.Height()-rect.Height();
+   int min_width = rect2.Width()-rect.Width();
++  int max_width = rect2.Width()-rect.Width();
+   m_keydlg.GetWindowRect(&rect);
+   min_height += rect.Height();
+   min_width += m_keydlg.MinWidth();
+-  SetWindowPos(NULL,0,0,min_width,256,SWP_NOMOVE|SWP_NOZORDER);
++  max_width += m_keydlg.MaxWidth();
++  SetWindowPos(NULL,0,0,max_width,256+m_keydlg.m_keyheader.MaxHeight()+m_keydlg.SynthesiaHeight(),SWP_NOMOVE|SWP_NOZORDER);
+   LocateDialogItems();
+ 
+   // setup colors
+@@ -565,7 +1041,19 @@
+ {
+   LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+   if(!m_initializing_list)
+-    m_showtrk[m_trkmap[pNMLV->iItem]] = m_trkinfo.GetCheck(pNMLV->iItem);
++  {
++    if (m_trkinfo.GetCheck(pNMLV->iItem))
++	{
++		CONFIG["MASK"] = CONFIG["MASK"]&(~(1<<m_trkmap[pNMLV->iItem]));
++	}
++	else
++	{
++		CONFIG["MASK"] = CONFIG["MASK"]|(1<<m_trkmap[pNMLV->iItem]);
++	}
++	parent->UpdateNSFPlayerConfig(true);
++	pm->cf->Notify(-1);
++    //m_showtrk[m_trkmap[pNMLV->iItem]] = m_trkinfo.GetCheck(pNMLV->iItem);
++  }
+   *pResult = 0;
+ }
+ 
+diff -Bwur nsfplay23src/nsfplug_ui/NSFTrackDialog.h nsfplay23src synthesia 0.55/nsfplug_ui/NSFTrackDialog.h
+--- nsfplay23src/nsfplug_ui/NSFTrackDialog.h	Mon Mar 16 10:26:22 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/NSFTrackDialog.h	Tue Mar 17 09:31:09 2015
+@@ -1,8 +1,8 @@
+ #pragma once
+ #include "NSFDialog.h"
+ #include "afxcmn.h"
+-#include "keydialog.h"
+ #include "NSFTrackSetupDialog.h"
++#include "keydialog.h"
+ 
+ // NSFTrackDialog ダイアログ
+ 
+@@ -16,10 +16,12 @@
+   KeyDialog m_keydlg;
+   int m_trkmap[NSFPlayer::NES_TRACK_MAX];
+   int m_maxtrk;
+-  BOOL m_showtrk[NSFPlayer::NES_TRACK_MAX];
++  //BOOL m_showtrk[NSFPlayer::NES_TRACK_MAX];
+   int m_keepkey[NSFPlayer::NES_TRACK_MAX];
+   int m_lastkey[NSFPlayer::NES_TRACK_MAX];
+   CString m_tonestr[NSFPlayer::NES_TRACK_MAX];
++  COLORREF ColorForNote(xgm::ITrackInfo*, int);
++  COLORREF ColorForWave(int, xgm::INT16[]);
+   void InitList();
+   BOOL m_initializing_list;
+   NSFTrackSetupDialog m_setup;
+@@ -27,6 +29,7 @@
+   CPen green_pen;
+   CMenu m_rmenu;
+   int m_trk_selected;
++  int frame_of_last_update;
+ 
+ // ダイアログ データ
+ 	enum { IDD = IDD_TRKINFO };
+diff -Bwur nsfplay23src/nsfplug_ui/NSFTrackSetupDialog.cpp nsfplay23src synthesia 0.55/nsfplug_ui/NSFTrackSetupDialog.cpp
+--- nsfplay23src/nsfplug_ui/NSFTrackSetupDialog.cpp	Mon Mar 16 10:26:22 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/NSFTrackSetupDialog.cpp	Tue Mar 17 09:10:32 2015
+@@ -12,6 +12,8 @@
+ 	: CDialog(NSFTrackSetupDialog::IDD, pParent)
+   , m_freq_value(0)
+   , m_delay_value(0)
++  , m_synth_speed_value(0)
++  , m_drums_speed_value(0)
+   , m_graphic_mode(FALSE)
+   , m_freq_mode(FALSE)
+ {
+@@ -26,10 +28,16 @@
+   CDialog::DoDataExchange(pDX);
+   DDX_Control(pDX, IDC_DELAY, m_delay);
+   DDX_Control(pDX, IDC_FREQ, m_freq);
++  DDX_Control(pDX, IDC_SYNTH_SPEED, m_synth_speed);
++  DDX_Control(pDX, IDC_DRUMS_SPEED, m_drums_speed);
+   DDX_Slider(pDX, IDC_FREQ, m_freq_value);
+   DDX_Slider(pDX, IDC_DELAY, m_delay_value);
++  DDX_Slider(pDX, IDC_SYNTH_SPEED, m_synth_speed_value);
++  DDX_Slider(pDX, IDC_DRUMS_SPEED, m_drums_speed_value);
+   DDX_Control(pDX, IDC_FREQ_TEXT, m_freq_text);
+   DDX_Control(pDX, IDC_DELAY_TEXT, m_delay_text);
++  DDX_Control(pDX, IDC_SYNTH_SPEED_TEXT, m_synth_speed_text);
++  DDX_Control(pDX, IDC_DRUMS_SPEED_TEXT, m_drums_speed_text);
+   DDX_Check(pDX, IDC_GRAPHIC_MODE, m_graphic_mode);
+   DDX_Check(pDX, IDC_FREQ_MODE, m_freq_mode);
+ }
+@@ -55,6 +63,14 @@
+   m_delay.SetTicFreq(250);
+   m_delay.SetPageSize(250);
+   m_delay.SetLineSize(50);
++  m_synth_speed.SetRange(1,8);
++  m_synth_speed.SetTicFreq(1);
++  m_synth_speed.SetPageSize(1);
++  m_synth_speed.SetLineSize(1);
++  m_drums_speed.SetRange(1,8);
++  m_drums_speed.SetTicFreq(1);
++  m_drums_speed.SetPageSize(1);
++  m_drums_speed.SetLineSize(1);
+   UpdateData(FALSE);
+ 
+   return TRUE;  // return TRUE unless you set the focus to a control
+@@ -69,6 +85,10 @@
+   m_freq_text.SetWindowText(text);
+   text.Format("%3dms",m_delay_value);
+   m_delay_text.SetWindowText(text);
++  text.Format("%d",m_synth_speed_value);
++  m_synth_speed_text.SetWindowText(text);
++  text.Format("%d",m_drums_speed_value);
++  m_drums_speed_text.SetWindowText(text);
+ }
+ 
+ void NSFTrackSetupDialog::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+@@ -85,6 +105,16 @@
+     text.Format("%3dms",m_delay.GetPos());
+     m_delay_text.SetWindowText(text);
+   }
++  else if((CSliderCtrl *)pScrollBar == &m_synth_speed)
++  {
++    text.Format("%d",m_synth_speed.GetPos());
++    m_synth_speed_text.SetWindowText(text);
++  }
++  else if((CSliderCtrl *)pScrollBar == &m_drums_speed)
++  {
++    text.Format("%d",m_drums_speed.GetPos());
++    m_drums_speed_text.SetWindowText(text);
++  }
+ 
+   CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
+ }
+diff -Bwur nsfplay23src/nsfplug_ui/NSFTrackSetupDialog.h nsfplay23src synthesia 0.55/nsfplug_ui/NSFTrackSetupDialog.h
+--- nsfplay23src/nsfplug_ui/NSFTrackSetupDialog.h	Mon Mar 16 10:26:23 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/NSFTrackSetupDialog.h	Tue Mar 17 09:10:32 2015
+@@ -24,13 +24,19 @@
+ public:
+   CSliderCtrl m_delay;
+   CSliderCtrl m_freq;
++  CSliderCtrl m_synth_speed;
++  CSliderCtrl m_drums_speed;
+   virtual BOOL OnInitDialog();
+   afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
+   afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+   int m_freq_value;
+   int m_delay_value;
++  int m_synth_speed_value;
++  int m_drums_speed_value;
+   CStatic m_freq_text;
+   CStatic m_delay_text;
++  CStatic m_synth_speed_text;
++  CStatic m_drums_speed_text;
+   BOOL m_graphic_mode;
+   BOOL m_freq_mode;
+ };
+diff -Bwur nsfplay23src/nsfplug_ui/nsf_setup.rc nsfplay23src synthesia 0.55/nsfplug_ui/nsf_setup.rc
+--- nsfplay23src/nsfplug_ui/nsf_setup.rc	Mon Mar 16 10:26:22 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/nsf_setup.rc	Tue Mar 17 09:10:32 2015
+@@ -463,9 +463,9 @@
+ FONT 9, "ＭＳ ゴシック", 400, 0, 0x80
+ BEGIN
+     LTEXT           "スロー再生",IDC_STATIC,6,5,42,8
+-    LTEXT           "x1",IDC_STATIC,54,5,9,8
++    LTEXT           "x1.0",IDC_STATIC,47,5,18,8
+     CONTROL         "",IDC_SPEED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,63,3,78,12
+-    LTEXT           "x8",IDC_STATIC,142,5,9,8
++    LTEXT           "x6.0",IDC_STATIC,142,5,18,8
+     PUSHBUTTON      "表示設定(&S)",IDC_SETUP,174,3,50,14
+     CONTROL         "",IDC_TRACKINFO,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,0,21,227,84
+ END
+@@ -1264,7 +1264,7 @@
+     LTEXT           "NTSC",IDC_PAL,189,50,20,10,SS_SUNKEN
+ END
+ 
+-IDD_TRKINFO_SETUP DIALOGEX 0, 0, 186, 104
++IDD_TRKINFO_SETUP DIALOGEX 0, 0, 186, 138
+ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+ CAPTION "Settings"
+ FONT 8, "MS Shell Dlg", 400, 0, 0x80
+@@ -1276,10 +1276,16 @@
+     CONTROL         "",IDC_DELAY,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,41,27,100,12
+     LTEXT           "??????",IDC_DELAY_TEXT,146,29,33,8
+     CONTROL         "Display wave patterns with &number.",IDC_GRAPHIC_MODE,
+-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,50,124,11
+-    CONTROL         "Display the frequency &registers.",IDC_FREQ_MODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,66,127,11
+-    DEFPUSHBUTTON   "OK",IDOK,38,83,50,14
+-    PUSHBUTTON      "CANCEL",IDCANCEL,93,83,50,14
++                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,124,11
++    CONTROL         "Display the frequency &registers.",IDC_FREQ_MODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,102,127,11
++    DEFPUSHBUTTON   "OK",IDOK,38,117,50,14
++    PUSHBUTTON      "CANCEL",IDCANCEL,93,117,50,14
++    LTEXT           "&Synthesia Speed",IDC_STATIC,7,46,33,17
++    CONTROL         "",IDC_SYNTH_SPEED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,41,48,100,12
++    LTEXT           "??????",IDC_SYNTH_SPEED_TEXT,146,49,33,8
++    LTEXT           "Synthesia Drum Speed",IDC_STATIC,7,69,40,16
++    CONTROL         "",IDC_DRUMS_SPEED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,41,67,100,12
++    LTEXT           "??????",IDC_DRUMS_SPEED_TEXT,146,68,33,8
+ END
+ 
+ IDD_TRKINFO DIALOGEX 0, 0, 228, 133
+@@ -1289,9 +1295,9 @@
+ FONT 8, "MS Shell Dlg", 400, 0, 0x80
+ BEGIN
+     LTEXT           "Time Expansion",IDC_STATIC,6,5,54,8
+-    LTEXT           "x1",IDC_STATIC,65,5,9,8
++    LTEXT           "x1.0",IDC_STATIC,60,5,18,8
+     CONTROL         "",IDC_SPEED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,74,3,78,12
+-    LTEXT           "x8",IDC_STATIC,153,5,9,8
++    LTEXT           "x6.0",IDC_STATIC,153,5,18,8
+     PUSHBUTTON      "&Settings...",IDC_SETUP,170,3,46,14
+     CONTROL         "",IDC_TRACKINFO,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,0,21,227,84
+ END
+@@ -1588,7 +1594,7 @@
+         LEFTMARGIN, 7
+         RIGHTMARGIN, 179
+         TOPMARGIN, 7
+-        BOTTOMMARGIN, 97
++        BOTTOMMARGIN, 131
+     END
+ 
+     IDD_TRKINFO, DIALOG
+diff -Bwur nsfplay23src/nsfplug_ui/nsfplug_ui.vcproj nsfplay23src synthesia 0.55/nsfplug_ui/nsfplug_ui.vcproj
+--- nsfplay23src/nsfplug_ui/nsfplug_ui.vcproj	Mon Mar 16 10:26:22 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/nsfplug_ui.vcproj	Tue Mar 17 09:10:32 2015
+@@ -74,7 +74,7 @@
+ 			<Tool
+ 				Name="VCLinkerTool"
+ 				OutputFile="$(OutDir)\$(ProjectName).dll"
+-				LinkIncremental="1"
++				LinkIncremental="2"
+ 				ModuleDefinitionFile=".\nsf_setup.def"
+ 				GenerateDebugInformation="true"
+ 				GenerateMapFile="true"
+diff -Bwur nsfplay23src/nsfplug_ui/resource.h nsfplay23src synthesia 0.55/nsfplug_ui/resource.h
+--- nsfplay23src/nsfplug_ui/resource.h	Mon Mar 16 10:26:22 2015
++++ nsfplay23src synthesia 0.55/nsfplug_ui/resource.h	Tue Mar 17 09:10:32 2015
+@@ -125,10 +125,14 @@
+ #define IDC_FREQ_TEXT                   2003
+ #define IDC_DELAY_TEXT                  2004
+ #define IDC_SETUP                       2005
++#define IDC_SYNTH_SPEED                 2005
+ #define IDC_SETUP2                      2006
++#define IDC_SYNTH_SPEED_TEXT            2006
+ #define IDD_INFOBOX2                    2007
+ #define IDC_SPEED                       2007
++#define IDC_DRUMS_SPEED                 2007
+ #define IDC_VSYNC                       2008
++#define IDC_DRUMS_SPEED_TEXT            2008
+ #define ID_DELONE                       2009
+ #define IDC_PREF_PAL                    2009
+ #define IDC_VSYNC2                      2009
+diff -Bwur nsfplay23src/test/main.cpp nsfplay23src synthesia 0.55/test/main.cpp
+--- nsfplay23src/test/main.cpp	Mon Mar 16 10:26:19 2015
++++ nsfplay23src synthesia 0.55/test/main.cpp	Tue Mar 17 09:10:32 2015
+@@ -24,6 +24,7 @@
+ 
+ int main(int argc, char *argv[]) {
+   
++  
+   if(argc<2) return 0;
+ 
+   EmuWinamp emu("in_yansf.dll");
+diff -Bwur nsfplay23src/xgm/devices/Sound/legacy/emu2413.c nsfplay23src synthesia 0.55/xgm/devices/Sound/legacy/emu2413.c
+--- nsfplay23src/xgm/devices/Sound/legacy/emu2413.c	Mon Mar 16 10:26:24 2015
++++ nsfplay23src synthesia 0.55/xgm/devices/Sound/legacy/emu2413.c	Tue Mar 17 09:10:32 2015
+@@ -517,29 +517,29 @@
+ void
+ OPLL_dump2patch (const e_uint8 * dump, OPLL_PATCH * patch)
+ {
+-  patch[0].AM = (dump[0] >> 7) & 1;
++  patch[0].AM = (dump[0] >> 7) & 1; //amplitude modulation (tremolo)
+   patch[1].AM = (dump[1] >> 7) & 1;
+-  patch[0].PM = (dump[0] >> 6) & 1;
++  patch[0].PM = (dump[0] >> 6) & 1; //phase modulation (vibrato)
+   patch[1].PM = (dump[1] >> 6) & 1;
+-  patch[0].EG = (dump[0] >> 5) & 1;
++  patch[0].EG = (dump[0] >> 5) & 1; //don't know
+   patch[1].EG = (dump[1] >> 5) & 1;
+-  patch[0].KR = (dump[0] >> 4) & 1;
++  patch[0].KR = (dump[0] >> 4) & 1; //don't know
+   patch[1].KR = (dump[1] >> 4) & 1;
+-  patch[0].ML = (dump[0]) & 15;
++  patch[0].ML = (dump[0]) & 15; //mult factor
+   patch[1].ML = (dump[1]) & 15;
+-  patch[0].KL = (dump[2] >> 6) & 3;
++  patch[0].KL = (dump[2] >> 6) & 3; //RATE key level
+   patch[1].KL = (dump[3] >> 6) & 3;
+-  patch[0].TL = (dump[2]) & 63;
+-  patch[0].FB = (dump[3]) & 7;
+-  patch[0].WF = (dump[3] >> 3) & 1;
++  patch[0].TL = (dump[2]) & 63; //modulator level
++  patch[0].FB = (dump[3]) & 7; //feedback
++  patch[0].WF = (dump[3] >> 3) & 1; //wave rectification
+   patch[1].WF = (dump[3] >> 4) & 1;
+-  patch[0].AR = (dump[4] >> 4) & 15;
++  patch[0].AR = (dump[4] >> 4) & 15; //attack rate
+   patch[1].AR = (dump[5] >> 4) & 15;
+-  patch[0].DR = (dump[4]) & 15;
++  patch[0].DR = (dump[4]) & 15; //decay rate
+   patch[1].DR = (dump[5]) & 15;
+-  patch[0].SL = (dump[6] >> 4) & 15;
++  patch[0].SL = (dump[6] >> 4) & 15; //sustain level
+   patch[1].SL = (dump[7] >> 4) & 15;
+-  patch[0].RR = (dump[6]) & 15;
++  patch[0].RR = (dump[6]) & 15; //release rate
+   patch[1].RR = (dump[7]) & 15;
+ }
+ 
+diff -Bwur nsfplay23src/xgm/devices/Sound/nes_apu.cpp nsfplay23src synthesia 0.55/xgm/devices/Sound/nes_apu.cpp
+--- nsfplay23src/xgm/devices/Sound/nes_apu.cpp	Mon Mar 16 10:26:24 2015
++++ nsfplay23src synthesia 0.55/xgm/devices/Sound/nes_apu.cpp	Tue Mar 17 09:10:32 2015
+@@ -267,7 +267,7 @@
+       trkinfo[trk].freq = 0;
+ 
+     trkinfo[trk].output = out[trk];
+-    trkinfo[trk].volume = volume[trk]+(envelope_disable[trk]?0:0x10)+(envelope_loop[trk]?0x20:0);
++	trkinfo[trk].volume = (envelope_disable[trk] ? volume[trk] : envelope_counter[trk])+(envelope_disable[trk]?0:0x10)+(envelope_loop[trk]?0x20:0);
+     trkinfo[trk].key =
+         enable[trk] &&
+         length_counter[trk] > 0 &&
+diff -Bwur nsfplay23src/xgm/devices/Sound/nes_dmc.cpp nsfplay23src synthesia 0.55/xgm/devices/Sound/nes_dmc.cpp
+--- nsfplay23src/xgm/devices/Sound/nes_dmc.cpp	Mon Mar 16 10:26:24 2015
++++ nsfplay23src synthesia 0.55/xgm/devices/Sound/nes_dmc.cpp	Tue Mar 17 09:10:32 2015
+@@ -75,7 +75,7 @@
+       break;
+     case 1:
+       trkinfo[1].max_volume = 15;
+-      trkinfo[1].volume = noise_volume+(envelope_disable?0:0x10)+(envelope_loop?0x20:0);
++	  trkinfo[1].volume = (envelope_disable ? noise_volume : envelope_counter)+(envelope_disable?0:0x10)+(envelope_loop?0x20:0);
+       trkinfo[1].key = length_counter[1]>0 && enable[1] &&
+                        (envelope_disable ? (noise_volume>0) : (envelope_counter>0));
+       trkinfo[1]._freq = reg[0x400e-0x4008]&0xF;
+diff -Bwur nsfplay23src/xgm/devices/Sound/nes_fme7.cpp nsfplay23src synthesia 0.55/xgm/devices/Sound/nes_fme7.cpp
+--- nsfplay23src/xgm/devices/Sound/nes_fme7.cpp	Mon Mar 16 10:26:24 2015
++++ nsfplay23src synthesia 0.55/xgm/devices/Sound/nes_fme7.cpp	Tue Mar 17 09:57:10 2015
+@@ -129,7 +129,14 @@
+ 
+       trkinfo[trk].output = psg->cout[trk];
+       trkinfo[trk].max_volume = 15;
++	  if (!(psg->volume[trk] & 32) || (psg->tmask[trk]))
++	  {
+       trkinfo[trk].volume = psg->volume[trk] >> 1;
++	  }
++	  else
++	  {
++		trkinfo[trk].volume = psg->env_ptr;
++	  }
+       //trkinfo[trk].key = (psg->cout[trk]>0)?true:false;
+       trkinfo[trk].key = !(psg->tmask[trk]);
+       trkinfo[trk].tone = (psg->tmask[trk]?2:0)+(psg->nmask[trk]?1:0);
+@@ -148,8 +155,8 @@
+       }
+       
+       trkinfo[trk].output = psg->voltbl[psg->env_ptr];
+-      trkinfo[trk].max_volume = 0;
+-      trkinfo[trk].volume = 0;
++      trkinfo[trk].max_volume = 15; //was 0
++      trkinfo[trk].volume = 8; //was 0
+       trkinfo[trk].key = (((psg->volume[0]|psg->volume[1]|psg->volume[2])&32) != 0);
+       trkinfo[trk].tone =
+           (psg->env_continue ?8:0) |
+@@ -166,8 +173,8 @@
+         trkinfo[trk].freq = 0;
+ 
+       trkinfo[trk].output = psg->noise_seed & 1;
+-      trkinfo[trk].max_volume = 0;
+-      trkinfo[trk].volume = 0;
++      trkinfo[trk].max_volume = 15; //was 0
++      trkinfo[trk].volume = 8; //was 0
+       //trkinfo[trk].key = ((psg->nmask[0]&psg->nmask[1]&psg->nmask[2]) == 0);
+       trkinfo[trk].key = false;
+       trkinfo[trk].tone = 0;
+diff -Bwur nsfplay23src/xgm/devices/Sound/nes_vrc7.cpp nsfplay23src synthesia 0.55/xgm/devices/Sound/nes_vrc7.cpp
+--- nsfplay23src/xgm/devices/Sound/nes_vrc7.cpp	Mon Mar 16 10:26:24 2015
++++ nsfplay23src synthesia 0.55/xgm/devices/Sound/nes_vrc7.cpp	Tue Mar 17 09:10:32 2015
+@@ -60,17 +60,25 @@
+       sm[1][trk] = mixr;
+   }
+ 
++  #define MOD(o,x) (&(o)->slot[(x)<<1])
++  #define CAR(o,x) (&(o)->slot[((x)<<1)|1])
++
+   ITrackInfo *NES_VRC7::GetTrackInfo(int trk)
+   {
+     if(opll&&trk<6)
+     {
+-      trkinfo[trk].max_volume = 15;
+-      trkinfo[trk].volume = 15 - ((opll->reg[0x30+trk])&15);
++      //trkinfo[trk].max_volume = 15;
++      //trkinfo[trk].volume = 15 - ((opll->reg[0x30+trk])&15);
++	  trkinfo[trk].volume = (255-CAR(opll,trk)->egout)*(15 - ((opll->reg[0x30+trk])&15)) / 15;
++	  trkinfo[trk].max_volume = 255;
+       trkinfo[trk]._freq = opll->reg[0x10+trk]+((opll->reg[0x20+trk]&1)<<8);
+       int blk = (opll->reg[0x20+trk]>>1)&7;
+       trkinfo[trk].freq = clock*trkinfo[trk]._freq/(double)(0x80000>>blk);
+-      trkinfo[trk].tone = (opll->reg[0x30+trk]>>4)&15;
++      //trkinfo[trk].tone = (opll->reg[0x30+trk]>>4)&15;
++	  trkinfo[trk].tone = (255-MOD(opll,trk)->egout);
+       trkinfo[trk].key = (opll->reg[0x20+trk]&0x10)?true:false;
++	  trkinfo[trk].misc = (MOD(opll,trk)->patch->FB)&0x7; //+ CAR(opll,trk)->patch->WF...
++	  if (trkinfo[trk].volume < 7) trkinfo[trk].key = false; //hack to remove released-into-oblivion notes
+       return &trkinfo[trk];
+     }
+     else
+diff -Bwur nsfplay23src/xgm/devices/devinfo.h nsfplay23src synthesia 0.55/xgm/devices/devinfo.h
+--- nsfplay23src/xgm/devices/devinfo.h	Mon Mar 16 10:26:24 2015
++++ nsfplay23src synthesia 0.55/xgm/devices/devinfo.h	Tue Mar 17 09:10:32 2015
+@@ -28,18 +28,24 @@
+     virtual bool GetKeyStatus()=0;
+     // トーン番号
+     virtual INT32 GetTone()=0;
++	virtual INT32 GetMisc()=0;
+ 
+     // 周波数をノート番号に変換．0x60がo4c 0は無効
+     static int GetNote(double freq)
+     {
++		return (int)GetFractionalNote(freq);
++    }
++
++	static double GetFractionalNote(double freq)
++    {
+       const double LOG2_440 = 8.7813597135246596040696824762152;
+       const double LOG_2 = 0.69314718055994530941723212145818;
+       const int NOTE_440HZ = 0x69;
+ 
+       if(freq>1.0)
+-        return (int)((12 * ( log(freq)/LOG_2 - LOG2_440 ) + NOTE_440HZ + 0.5));
++        return ((12 * ( log(freq)/LOG_2 - LOG2_440 ) + NOTE_440HZ + 0.5));
+       else
+-        return 0;
++        return 0.0;
+     }
+   };
+ 
+@@ -111,6 +117,7 @@
+     double freq;
+     bool key;
+     INT32 tone;
++	INT32 misc;
+     virtual IDeviceInfo *Clone(){ return new TrackInfoBasic(*this); }
+     virtual INT32 GetOutput(){ return output; }
+     virtual double GetFreqHz(){ return freq; }
+@@ -118,7 +125,8 @@
+     virtual bool GetKeyStatus(){ return key; }
+     virtual INT32 GetVolume(){ return volume; }
+     virtual INT32 GetMaxVolume(){ return max_volume; }
+-    virtual INT32 GetTone(){ return tone; };
++    virtual INT32 GetTone(){ return tone; }
++    virtual INT32 GetMisc(){ return misc; };
+   };
+ 
+ }// namespace xgm
+diff -Bwur nsfplay23src/xgm/player/nsf/nsf.cpp nsfplay23src synthesia 0.55/xgm/player/nsf/nsf.cpp
+--- nsfplay23src/xgm/player/nsf/nsf.cpp	Mon Mar 16 10:26:25 2015
++++ nsfplay23src synthesia 0.55/xgm/player/nsf/nsf.cpp	Tue Mar 17 09:10:32 2015
+@@ -169,7 +169,7 @@
+           break;
+         case 'L':
+         case 'l':
+-          wp += sprintf(print_title+wp, "%s", nsfe_entry[nsfe_plst?nsfe_plst[song]:song].tlbl);
++          wp += sprintf(print_title+wp, "%s", nsfe_entry[song].tlbl);
+           format++;
+           break;
+         case 'N':
+@@ -444,8 +444,10 @@
+     speed_pal = image[0x78] | (image[0x79] << 8);
+     pal_ntsc = image[0x7a];
+ 
+-    if(speed_pal==0 ) speed_pal  = 19997;
+-    if(speed_ntsc==0) speed_ntsc = 16639;
++    if(speed_pal==0)
++      speed_pal = 0x4e20;
++    if(speed_ntsc==0)
++      speed_ntsc = 0x411A;
+ 
+     soundchip = image[0x7b];
+ 
+@@ -532,8 +534,8 @@
+           start        = chunk[0x09] + 1; // note NSFe is 0 based, unlike NSF
+ 
+           // NSFe doesn't allow custom speeds
+-          speed_ntsc = 16639; // 60.09Hz
+-          speed_pal  = 19997; // 50.00Hz
++          speed_ntsc = 0x4100; // 60.09Hz
++          speed_pal  = 0x4E1D; // 50.00Hz
+ 
+           // other variables contained in other banks
+           memset (bankswitch, 0, 8);
+diff -Bwur nsfplay23src/xgm/player/nsf/nsfconfig.cpp nsfplay23src synthesia 0.55/xgm/player/nsf/nsfconfig.cpp
+--- nsfplay23src/xgm/player/nsf/nsfconfig.cpp	Mon Mar 16 10:26:25 2015
++++ nsfplay23src synthesia 0.55/xgm/player/nsf/nsfconfig.cpp	Tue Mar 17 09:10:32 2015
+@@ -77,7 +77,7 @@
+ {
+   int i, j;
+ 
+-  CreateValue("RATE", 48000);
++  CreateValue("RATE", 44100);
+   CreateValue("NCH",  2);
+   CreateValue("BPS",  16);
+   CreateValue("MASK", 0);
+@@ -95,6 +95,11 @@
+   CreateValue("DETECT_ALT", 0);
+   CreateValue("VSYNC_ADJUST", 0);
+   CreateValue("MULT_SPEED", 256); // clock speed multiplier
++  CreateValue("SYNTH_SPEED", 1); // pixels scrolled in synthesia per frame
++  CreateValue("DRUMS_SPEED", 1); // pixels scrolled in synthesia noise/drums per frame
++  CreateValue("SYNTHESIA_WIDTH", 841); // How wide the synthesia window is
++  CreateValue("SYNTHESIA_HEIGHT", 400); // How tall the synthesia window is
++  CreateValue("DRUMS_HEIGHT", 60); // How tall the synthesia window is
+   CreateValue("VRC7_PATCH", 0); // VRC7 patch set
+   CreateValue("NSFE_PLAYLIST", 1); // use NSFe playlist
+ 
+diff -Bwur nsfplay23src/xgm/player/nsf/nsfplay.cpp nsfplay23src synthesia 0.55/xgm/player/nsf/nsfplay.cpp
+--- nsfplay23src/xgm/player/nsf/nsfplay.cpp	Mon Mar 16 10:26:25 2015
++++ nsfplay23src synthesia 0.55/xgm/player/nsf/nsfplay.cpp	Tue Mar 17 09:10:32 2015
+@@ -379,9 +379,9 @@
+     fds->SetMask( (*config)["MASK"].GetInt()>>5 );
+     mmc5->SetMask((*config)["MASK"].GetInt()>>6 );
+     fme7->SetMask((*config)["MASK"].GetInt()>>9 );
+-    vrc6->SetMask((*config)["MASK"].GetInt()>>12);
+-    vrc7->SetMask((*config)["MASK"].GetInt()>>15);
+-    n106->SetMask((*config)["MASK"].GetInt()>>21);
++    vrc6->SetMask((*config)["MASK"].GetInt()>>14);
++    vrc7->SetMask((*config)["MASK"].GetInt()>>17);
++    n106->SetMask((*config)["MASK"].GetInt()>>23);
+ 
+     vrc7->SetPatchSet((*config)["VRC7_PATCH"].GetInt());
+ 
+@@ -781,15 +781,15 @@
+       fme7->SetMask((*config)["MASK"].GetInt()>>9);
+       break;
+     case VRC6:
+-      vrc6->SetMask((*config)["MASK"].GetInt()>>12);
++      vrc6->SetMask((*config)["MASK"].GetInt()>>14);
+       break;
+     case VRC7:
+-      vrc7->SetMask((*config)["MASK"].GetInt()>>15);
++      vrc7->SetMask((*config)["MASK"].GetInt()>>17);
+       break;
+     case N106:
+       for (i = 0; i < NES_N106::OPT_END; i++)
+         n106->SetOption (i, config->GetDeviceOption(id,i));
+-      n106->SetMask((*config)["MASK"].GetInt()>>21);
++      n106->SetMask((*config)["MASK"].GetInt()>>23);
+       break;
+     default:
+       break;

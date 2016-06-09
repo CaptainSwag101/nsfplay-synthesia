@@ -125,10 +125,14 @@
 #define IDC_FREQ_TEXT                   2003
 #define IDC_DELAY_TEXT                  2004
 #define IDC_SETUP                       2005
+#define IDC_SYNTH_SPEED                 2005
 #define IDC_SETUP2                      2006
+#define IDC_SYNTH_SPEED_TEXT            2006
 #define IDD_INFOBOX2                    2007
 #define IDC_SPEED                       2007
+#define IDC_DRUMS_SPEED                 2007
 #define IDC_VSYNC                       2008
+#define IDC_DRUMS_SPEED_TEXT            2008
 #define ID_DELONE                       2009
 #define IDC_PREF_PAL                    2009
 #define IDC_VSYNC2                      2009
