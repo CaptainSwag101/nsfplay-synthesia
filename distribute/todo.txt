@@ -1,6 +1,7 @@
 Emu:
 - full-emulation quality option (emulate at M2 speed and downsample)
 - Rewrite 5B implementation for better synchronization with clock (is currently independent of clock).
+- 5B does not support ImATrackMan's PWM envelope volume control (i.e. high freq square + env = half volume env)
 - VRC7 emulation accuracy
 - MMC5 squares, are they nonlinear, does PCM affect them?
 - Battletoads track 10, noise sounds much duller on hardware.
@@ -9,9 +10,19 @@ Emu:
 - Play Metroid FDS 33 on hardware, make sure that wrapping is correct.
 - Conversion of float to int, use _controlfp? or floor if offline precalc
 - N163 bad-emulation options (old-length, no-phase write)
+- Better post-processing controls: lowpass/highpass as specified cutoff, log slider, option for 2-pole etc., optional bandpass?, compressor, nonlinear distortion?
+- look at clock_of_frame / clock_per_frame fixed point math, currently good enough for default 2MHz CPU but how well is it bounded with custom CPU speed? 10 bits would probably be sufficient, and go to 20MHz custom.
+- mode for poll-style interrupts would be useful (to match poewrpak) vs NMI style (to match games/TNS)
+-- wonder if battletoads noise thing is just CPU spikes?
+-- (if frame length has exceeded, instead of break until next when it hits, run another frame and clear the counter)
+-- test against BotB 20492 djmaximum - lights of are minds (virtuansf1061 recommended).nsf
 UI:
+- Play/pause/stop doesn't work like most player UI, revise their function.
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
+- Re-range volume sliders from 0 to 200%, default at centre.
+- Play + no file loaded = open?
+- Winamp plugin: hover over taskbar, play controls work but track select does not work properly.
 Other:
 - Play speed override option (keyboard adjustment should have more than just 1-8 integers), maybe allow CPU speed adjustment too?
 - FDS write protect > default on if multi-chip
@@ -22,6 +33,7 @@ Other:
 
 
 Later version:
+- Seeking easier, seek when paused/stopped?
 - Sound device selection.
 - Bus/stack plugins: NSF validator, other export tools
 - Improve loop detection

@@ -6,8 +6,8 @@ This is an NSF player program for Windows, and also a Winamp plugin. The origina
 To use as a Winamp plugin, simply copy the contents of the plugins folder to your Winamp plugins folder.
 
 Full source code is available at:
-- http://code.google.com/p/nsfplay/
 - http://rainwarrior.ca/projects/nsfplay/
+- http://github.com/bbbradsmith/nsfplay
 
 If you have any questions, comments, or find any bugs, please send them to me.
 
@@ -79,7 +79,7 @@ Global options:
   FREQ_MODE: 1=display Hz in keyboard view, 0=display hexadecimal pitch register
   LAST_PRESET: name of the last sound preset used
   INI_FILE: ?
-  LOG_CPU: log CPU writes to file (0=off, 1=sound only, 2=all writes, 3=all r/w)
+  LOG_CPU: log CPU writes to file (0=off, 1=sound only, 2=all writes, 3=all r/w, 4 bank and RAM writes)
   LOG_CPU_FILE: filename of CPU write log
 
 TITLE_FORMAT text replacement:
@@ -160,7 +160,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.4 - ?????????
+NSFPlay 2.4 beta 4 - ?
 - Fixed incorrect bytes per second in stereo WAV output.
 - Fixed NSFe track title display when using playlist.
 - Fixed crash issue with 1MB NSF files. (Bank counting was incorrect.)
@@ -168,6 +168,10 @@ NSFPlay 2.4 - ?????????
 - More bits of precision on fade-out, creates smoother fade.
 - 48000Hz is the new default samplerate.
 - Fixed keyboard view wave string bias on N163/FDS.
+- Fixed frequency rounding for triangle/noise/DMC in keyboard display.
+- Fixed intermittent crash with Winamp starting up with NSF in playlist.
+- Fixed FDS mod table bit-mask and wavetable read address. (Minor.)
+- Fixed broken playback rate for rates < 28 Hz
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:
