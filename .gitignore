@@ -8,3 +8,5 @@ nsfplay.ncb
 distribute/nsfplay.exe
 distribute/plugins/in_yansf.dll
 distribute/plugins/nsfplug_ui.dll
+*.suo
+nsfplay.VC.db

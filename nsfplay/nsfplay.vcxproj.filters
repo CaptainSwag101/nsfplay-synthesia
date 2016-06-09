@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{40e91645-fa05-4595-a539-5a627b7aa5ee}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{b39e3791-0199-4f16-99f2-a45a41105cb7}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{ff9b3343-08e0-4f13-a982-ce16b22751f7}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;jpg;jpeg;jpe;manifest</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="nsfplay.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="nsfplayDlg.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="nsfplay.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="nsfplayDlg.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\about.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="res\config.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="res\next.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="res\nsfplay.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="res\nsfplug.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="res\open.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="res\pause.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="res\play.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="res\prev.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="res\prop.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="res\stop.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="res\volume.bmp">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="res\volume.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="res\waveout.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="res\nsfplay.manifest">
+      <Filter>リソース ファイル</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nsfplay.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\nsfplay.rc2">
+      <Filter>リソース ファイル</Filter>
+    </None>
+  </ItemGroup>
+</Project>
