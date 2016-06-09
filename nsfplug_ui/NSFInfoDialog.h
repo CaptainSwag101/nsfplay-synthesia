@@ -17,7 +17,7 @@ using namespace xgm;
 
 class NSFInfoDialog : public CDialog, public NSFDialog
 {
-// コンストラクション
+	// コンストラクション
 public:
 	NSFInfoDialog(CWnd* pParent = NULL);   // 標準のコンストラクタ
 // ダイアログ データ
@@ -35,13 +35,13 @@ public:
 	CString	m_n106;
 	CString	m_vrc6;
 	CString	m_vrc7;
-    CString m_pal;
+	CString m_pal;
 	//}}AFX_DATA
 
 // オーバーライド
 	// ClassWizard は仮想関数のオーバーライドを生成します。
 	//{{AFX_VIRTUAL(NSFInfoDialog)
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV サポート
 	//}}AFX_VIRTUAL
 
@@ -68,26 +68,26 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
-// ユーザー追加
+	// ユーザー追加
 protected:
-  NSF nsf, nsf_copy;
-  NSF_TAG ntag;
-  bool local_tag;
-  void GeneratePlaylist(bool clear);
+	NSF nsf, nsf_copy;
+	NSF_TAG ntag;
+	bool local_tag;
+	void GeneratePlaylist(bool clear);
 
 public:
-  void SetInfo(char *fn);
-  void SetInfo(NSF *n);
+	void SetInfo(char *fn);
+	void SetInfo(NSF *n);
 
-  afx_msg void OnDelall();
-  afx_msg void OnDelone();
-  afx_msg void OnReadtag();
-  afx_msg void OnWritetag();
-  afx_msg void OnTrkinfo();
-  afx_msg void OnStnClickedArtist();
-  afx_msg void OnDropFiles(HDROP hDropInfo);
-  afx_msg void OnNewpls();
-  afx_msg void OnLoadpreset();
+	afx_msg void OnDelall();
+	afx_msg void OnDelone();
+	afx_msg void OnReadtag();
+	afx_msg void OnWritetag();
+	afx_msg void OnTrkinfo();
+	afx_msg void OnStnClickedArtist();
+	afx_msg void OnDropFiles(HDROP hDropInfo);
+	afx_msg void OnNewpls();
+	afx_msg void OnLoadpreset();
 };
 
 //{{AFX_INSERT_LOCATION}}

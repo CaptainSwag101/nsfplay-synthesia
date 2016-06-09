@@ -22,50 +22,50 @@
 class NSFConfigDialog : public CPropertySheet, public NSFDialog
 {
 	DECLARE_DYNAMIC(NSFConfigDialog)
-//
+	//
 protected:
-  NSFConfigPageMain *mainPage;
-  NSFConfigPageDevice *devicePage[xgm::NES_DEVICE_MAX];
-  NSFApuPanel *apuPanel;
-  NSFFdsPanel *fdsPanel;
-  NSFDmcPanel *dmcPanel;
-  NSFMMC5Panel *mmc5Panel;
-  NSFN106Panel *n106Panel;
-  
-// コンストラクション
+	NSFConfigPageMain *mainPage;
+	NSFConfigPageDevice *devicePage[xgm::NES_DEVICE_MAX];
+	NSFApuPanel *apuPanel;
+	NSFFdsPanel *fdsPanel;
+	NSFDmcPanel *dmcPanel;
+	NSFMMC5Panel *mmc5Panel;
+	NSFN106Panel *n106Panel;
+
+	// コンストラクション
 public:
 	NSFConfigDialog(UINT nIDCaption, CWnd* pParentWnd = NULL, UINT iSelectPage = 0);
 	NSFConfigDialog(LPCTSTR pszCaption, CWnd* pParentWnd = NULL, UINT iSelectPage = 0);
-// アトリビュート
+	// アトリビュート
 public:
-  CButton m_ok, m_cancel, m_apply;
+	CButton m_ok, m_cancel, m_apply;
 
-// オペレーション
+	// オペレーション
 public:
-  void SetDialogManager(NSFDialogManager *p);
-  void UpdateNSFPlayerConfig(bool b);
-  void Open();
+	void SetDialogManager(NSFDialogManager *p);
+	void UpdateNSFPlayerConfig(bool b);
+	void Open();
 
-// オーバーライド
-	// ClassWizard は仮想関数のオーバーライドを生成します。
-	//{{AFX_VIRTUAL(NSFConfigDialog)
-	//}}AFX_VIRTUAL
+	// オーバーライド
+		// ClassWizard は仮想関数のオーバーライドを生成します。
+		//{{AFX_VIRTUAL(NSFConfigDialog)
+		//}}AFX_VIRTUAL
 
-// インプリメンテーション
+	// インプリメンテーション
 public:
 	virtual ~NSFConfigDialog();
 
 	// 生成されたメッセージ マップ関数
 protected:
 	//{{AFX_MSG(NSFConfigDialog)
-  afx_msg void OnOK();
-  afx_msg void OnApply();
-  afx_msg void OnCancel();
+	afx_msg void OnOK();
+	afx_msg void OnApply();
+	afx_msg void OnCancel();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
-  virtual BOOL OnInitDialog();
-  afx_msg void OnClose();
+	virtual BOOL OnInitDialog();
+	afx_msg void OnClose();
 };
 
 /////////////////////////////////////////////////////////////////////////////
