@@ -23,6 +23,7 @@
 #include "../libemuwa2/emu_winamp.h"
 
 int main(int argc, char *argv[]) {
+
   
   if(argc<2) return 0;
 

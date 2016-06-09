@@ -74,7 +74,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
-				LinkIncremental="1"
+				LinkIncremental="2"
 				ModuleDefinitionFile=".\nsf_setup.def"
 				GenerateDebugInformation="true"
 				GenerateMapFile="true"

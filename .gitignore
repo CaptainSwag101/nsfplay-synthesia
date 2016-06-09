@@ -2,11 +2,11 @@ cmd.exe.lnk
 Debug
 Release
 *.user
+*.suo
+*.ncb
 nsfplug_ui/hlp/nsfplug.chm
-nsfplay.suo
-nsfplay.ncb
 distribute/nsfplay.exe
 distribute/plugins/in_yansf.dll
 distribute/plugins/nsfplug_ui.dll
-*.suo
-nsfplay.VC.db
+*.db
+*.filters

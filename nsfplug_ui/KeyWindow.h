@@ -21,8 +21,14 @@ public:
   // 全てキーオフ
   virtual void Reset();
 
+  virtual void TrackOn(int track, int color, int volume, double fractionalNote, int frame);
+
   inline int MinWidth(){ return 366+1; }
-  inline int MaxWidth(){ return 336*2+1; }
+  inline int MaxWidth(){ return synthesiaWidth; }
+  inline int SynthesiaHeight(){ return synthesiaHeight; }
+  int synthesiaHeight;
+  int synthesiaWidth;
+  int startingOctave;
 
   // 描画したキーボードを格納
   CBitmap m_keyBitmap;
@@ -36,10 +42,27 @@ public:
   CBitmap m_memBitmap;
   CDC m_memDC;
 
+static const int MAX_FRAMES = 10;
+static const int NUM_OCTAVES = 10;
+
   // 発音状態フラグ
   int m_nKeyStatus[256];
   // 発音する色
   int m_nKeyColor[256];
+
+  //backside
+  int numberofframes;
+  //int lastnumberofframes;
+  int synth_speed;
+
+  static const int NES_TRACK_MAX = 31;
+
+  //xgm::ITrackInfo* m_nTrackInfo[NES_TRACK_MAX][MAX_FRAMES];
+  int m_nTrackStatus[NES_TRACK_MAX][MAX_FRAMES];
+  int m_nTrackColor[NES_TRACK_MAX][MAX_FRAMES];
+  int m_nTrackVolume[NES_TRACK_MAX][MAX_FRAMES];
+  double m_nTrackFractionalNote[NES_TRACK_MAX][MAX_FRAMES];
+  int numberoftracks;
 
   // 初期化完了フラグ
   bool m_bInit;

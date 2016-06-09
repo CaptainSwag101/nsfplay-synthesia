@@ -129,8 +129,21 @@ ITrackInfo *NES_FME7::GetTrackInfo(int trk)
 
       trkinfo[trk].output = psg->cout[trk];
       trkinfo[trk].max_volume = 15;
-      trkinfo[trk].volume = psg->volume[trk] >> 1;
-      //trkinfo[trk].key = (psg->cout[trk]>0)?true:false;
+	  if (!(psg->volume[trk] & 32) || (psg->tmask[trk]))
+	  {
+		trkinfo[trk].volume = psg->volume[trk] >> 1;
+	  }
+	  else
+	  {
+		if ((psg->clk/512.0/psg->env_freq) > 10.0 && (psg->volume[trk] & 32) && !(psg->tmask[trk]) && psg->env_continue && !psg->env_hold) //volume modulation by envelope has created a new instrument!
+		{
+			trkinfo[trk].volume = 1 | 32 | (psg->env_alternate ? 128 : 64);
+		}
+		else
+		{
+			trkinfo[trk].volume = psg->env_ptr >> 1;
+		}
+	  }
       trkinfo[trk].key = !(psg->tmask[trk]);
       trkinfo[trk].tone = (psg->tmask[trk]?2:0)+(psg->nmask[trk]?1:0);
     }
@@ -148,10 +161,11 @@ ITrackInfo *NES_FME7::GetTrackInfo(int trk)
       }
       
       trkinfo[trk].output = psg->voltbl[psg->env_ptr];
-      trkinfo[trk].max_volume = 0;
-      trkinfo[trk].volume = 0;
-      trkinfo[trk].key = (((psg->volume[0]|psg->volume[1]|psg->volume[2])&32) != 0);
+      trkinfo[trk].max_volume = 15; //was 0
+	  trkinfo[trk].volume = (psg->env_continue == 0 || psg->env_hold == 1) ? 0 : 8; //was 0
+      trkinfo[trk].key = (((psg->volume[0]|psg->volume[1]|psg->volume[2])&32) != 0) || (psg->tmask[0]&&psg->nmask[0]) || (psg->tmask[1]&&psg->nmask[1]) || (psg->tmask[2]&&psg->nmask[2]);
       trkinfo[trk].tone =
+		  ((psg->clk/512.0/psg->env_freq) > 10.0 && ((psg->volume[0] & 32 && !(psg->tmask[0])) || (psg->volume[1] & 32 && !(psg->tmask[01])) || (psg->volume[2] & 32 && !(psg->tmask[2])) ) && psg->env_continue && !psg->env_hold ? 16:0) | //new flag for volume modulated instrument
           (psg->env_continue ?8:0) |
           (psg->env_attack   ?4:0) |
           (psg->env_alternate?2:0) |
@@ -166,10 +180,27 @@ ITrackInfo *NES_FME7::GetTrackInfo(int trk)
         trkinfo[trk].freq = 0;
 
       trkinfo[trk].output = psg->noise_seed & 1;
-      trkinfo[trk].max_volume = 0;
-      trkinfo[trk].volume = 0;
-      //trkinfo[trk].key = ((psg->nmask[0]&psg->nmask[1]&psg->nmask[2]) == 0);
-      trkinfo[trk].key = false;
+      trkinfo[trk].max_volume = 15; //was 0
+	  trkinfo[trk].volume = 0;
+	  trkinfo[trk].key = false;
+	  for (int i = 0; i < 3; ++i)
+	  {
+		if (psg->nmask[i] == 0)
+		{
+	      if ((psg->volume[i] & 32) != 0) //envelope is volume modulating noise via this channel
+		  {
+			trkinfo[trk].volume = psg->env_ptr >> 1;
+			trkinfo[trk].key = true;
+			break;
+	      }
+		  else if (psg->volume[i] != 0) //directly playing noise on this channel using its normal volume
+		  {
+		    trkinfo[trk].volume = (psg->volume[i] >> 1)&15;
+			trkinfo[trk].key = true;
+			break;
+	      }
+		}
+	  }
       trkinfo[trk].tone = 0;
     }
   }

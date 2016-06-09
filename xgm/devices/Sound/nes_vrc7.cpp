@@ -60,17 +60,25 @@ namespace xgm
       sm[1][trk] = mixr;
   }
 
+  #define MOD(o,x) (&(o)->slot[(x)<<1])
+  #define CAR(o,x) (&(o)->slot[((x)<<1)|1])
+
   ITrackInfo *NES_VRC7::GetTrackInfo(int trk)
   {
     if(opll&&trk<6)
     {
-      trkinfo[trk].max_volume = 15;
-      trkinfo[trk].volume = 15 - ((opll->reg[0x30+trk])&15);
+      //trkinfo[trk].max_volume = 15;
+      //trkinfo[trk].volume = 15 - ((opll->reg[0x30+trk])&15);
+	  trkinfo[trk].volume = (255-CAR(opll,trk)->egout)*(15 - ((opll->reg[0x30+trk])&15)) / 15;
+	  trkinfo[trk].max_volume = 255;
       trkinfo[trk]._freq = opll->reg[0x10+trk]+((opll->reg[0x20+trk]&1)<<8);
       int blk = (opll->reg[0x20+trk]>>1)&7;
       trkinfo[trk].freq = clock*trkinfo[trk]._freq/(double)(0x80000>>blk);
-      trkinfo[trk].tone = (opll->reg[0x30+trk]>>4)&15;
+      //trkinfo[trk].tone = (opll->reg[0x30+trk]>>4)&15;
+	  trkinfo[trk].tone = (255-MOD(opll,trk)->egout);
       trkinfo[trk].key = (opll->reg[0x20+trk]&0x10)?true:false;
+	  trkinfo[trk].misc = (MOD(opll,trk)->patch->FB)&0x7; //+ CAR(opll,trk)->patch->WF...
+	  if (trkinfo[trk].volume < 7) trkinfo[trk].key = false; //hack to remove released-into-oblivion notes
       return &trkinfo[trk];
     }
     else

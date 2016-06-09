@@ -73,8 +73,9 @@ void NES_CPU::startup (UINT32 address)
   bus->Write (context.PC+5, breakpoint>>8);
 }
 
-UINT32 NES_CPU::Exec (UINT32 clock)
+UINT32 NES_CPU::Exec (UINT32 clock, bool *frameElapsed)
 {
+  *frameElapsed = false;
   context.clock = 0;
 
   while ( context.clock < clock )
@@ -120,10 +121,12 @@ UINT32 NES_CPU::Exec (UINT32 clock)
       else
         context.clock = clock;
     }
-
-    // wait for interrupt
+	
+    // フレームクロックに到達
+	// wait for interrupt
     if ( (clock_of_frame >> FRAME_FIXED) < context.clock)
     {
+	  *frameElapsed = true;
       if (breaked)
       {
         if (log_cpu)
@@ -214,6 +217,7 @@ void NES_CPU::Reset ()
 
 void NES_CPU::Start (int start_adr, int int_adr, double int_freq, int a, int x, int y)
 {
+  // 割り込みアドレス設定
   // approximate frame timing as an integer number of CPU clocks
   int_address = int_adr;
   clock_per_frame = (int)((double)((1 << FRAME_FIXED) * NES_BASECYCLES) / int_freq );

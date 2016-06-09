@@ -30,6 +30,7 @@ NSFDialogManager::NSFDialogManager(NSFplug_Model *p, int mode = 0)
     track = new NSFTrackDialog();
     track->SetDialogManager(this);
     track->Create(track->IDD);
+	OpenDialog(NSFplug_UI::DLG_TRACK);
   }
   memory->Create(memory->IDD);
   memory->SetWindowPos(NULL,0,0,523,328,SWP_NOZORDER|SWP_NOMOVE);
@@ -60,6 +61,10 @@ void NSFDialogManager::UpdateNSFPlayerConfig(bool b)
   config->UpdateNSFPlayerConfig(b);
   mask->UpdateNSFPlayerConfig(b);
   preset->UpdateNSFPlayerConfig(b);
+  if(mode==0)
+  {
+    track->UpdateNSFPlayerConfig(b);
+  }
 }
 
 NSFDialogManager::~NSFDialogManager()

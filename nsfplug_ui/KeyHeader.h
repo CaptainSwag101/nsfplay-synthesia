@@ -1,5 +1,6 @@
 #pragma once
-
+#include "NSFDialog.h"
+#include "NSFTrackSetupDialog.h"
 
 // KeyHeader ダイアログ
 
@@ -22,15 +23,26 @@ public:
   // ペン
   CPen softgray_pen;
 
-  int m_nNoiseStatus;
-  int m_nDPCMStatus;
+  int m_nNoiseStatus[10];
+  int m_nNoiseVolume[10];
+  int m_nNoiseTone[10];
+  int m_nDPCMStatus[10];
+  int m_nDPCMVolume[10];
+  int m_nDPCMTone[10];
+  int m_n5BNoiseStatus[10];
+  int m_n5BNoiseVolume[10];
+
+  int numberofframes;
+  int drums_speed;
 
   virtual void Reset();
 
   inline int MinWidth(){ return 336+1; }
-  inline int MaxWidth(){ return 336*2+1; }
-  inline int MinHeight(){ return 24; }
-  inline int MaxHeight(){ return 24; }
+  inline int MaxWidth(){ return synthesiaWidth; }
+  inline int MinHeight(){ return 60; }
+  inline int MaxHeight(){ return drumsHeight; }
+  int drumsHeight;
+  int synthesiaWidth;
 
 // ダイアログ データ
 	enum { IDD = IDD_KEYHEADER };

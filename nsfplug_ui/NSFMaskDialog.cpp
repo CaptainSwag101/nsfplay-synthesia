@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "NSFMaskDialog.h"
+#include "NSFDialogs.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -27,6 +28,8 @@ NSFMaskDialog::NSFMaskDialog(CWnd* pParent /*=NULL*/)
 	m_fme7_1 = FALSE;
 	m_fme7_2 = FALSE;
 	m_fme7_3 = FALSE;
+    //m_fme7_4 = FALSE;
+	//m_fme7_5 = FALSE;
 	m_mmc5_1 = FALSE;
 	m_mmc5_2 = FALSE;
 	m_mmc5_3 = FALSE;
@@ -69,23 +72,25 @@ void NSFMaskDialog::UpdateNSFPlayerConfig(bool b)
     m_fme7_1= (int)CONFIG["MASK"]&0x00000200?false:true;
     m_fme7_2= (int)CONFIG["MASK"]&0x00000400?false:true;
     m_fme7_3= (int)CONFIG["MASK"]&0x00000800?false:true;
-    m_vrc6_1= (int)CONFIG["MASK"]&0x00001000?false:true;
-    m_vrc6_2= (int)CONFIG["MASK"]&0x00002000?false:true;
-    m_vrc6_3= (int)CONFIG["MASK"]&0x00004000?false:true;
-    m_vrc7_1= (int)CONFIG["MASK"]&0x00008000?false:true;
-    m_vrc7_2= (int)CONFIG["MASK"]&0x00010000?false:true;
-    m_vrc7_3= (int)CONFIG["MASK"]&0x00020000?false:true;
-    m_vrc7_4= (int)CONFIG["MASK"]&0x00040000?false:true;
-    m_vrc7_5= (int)CONFIG["MASK"]&0x00080000?false:true;
-    m_vrc7_6= (int)CONFIG["MASK"]&0x00100000?false:true;
-    m_n106_1= (int)CONFIG["MASK"]&0x00200000?false:true;
-    m_n106_2= (int)CONFIG["MASK"]&0x00400000?false:true;
-    m_n106_3= (int)CONFIG["MASK"]&0x00800000?false:true;
-    m_n106_4= (int)CONFIG["MASK"]&0x01000000?false:true;
-    m_n106_5= (int)CONFIG["MASK"]&0x02000000?false:true;
-    m_n106_6= (int)CONFIG["MASK"]&0x04000000?false:true;
-    m_n106_7= (int)CONFIG["MASK"]&0x08000000?false:true;
-    m_n106_8= (int)CONFIG["MASK"]&0x10000000?false:true; 
+  //m_fme7_4= (int)CONFIG["MASK"]&0x00001000?false:true;
+  //m_fme7_5= (int)CONFIG["MASK"]&0x00002000?false:true;
+    m_vrc6_1= (int)CONFIG["MASK"]&0x00004000?false:true;
+    m_vrc6_2= (int)CONFIG["MASK"]&0x00008000?false:true;
+    m_vrc6_3= (int)CONFIG["MASK"]&0x00010000?false:true;
+    m_vrc7_1= (int)CONFIG["MASK"]&0x00020000?false:true;
+    m_vrc7_2= (int)CONFIG["MASK"]&0x00040000?false:true;
+    m_vrc7_3= (int)CONFIG["MASK"]&0x00080000?false:true;
+    m_vrc7_4= (int)CONFIG["MASK"]&0x00100000?false:true;
+    m_vrc7_5= (int)CONFIG["MASK"]&0x00200000?false:true;
+    m_vrc7_6= (int)CONFIG["MASK"]&0x00400000?false:true;
+    m_n106_1= (int)CONFIG["MASK"]&0x00800000?false:true;
+    m_n106_2= (int)CONFIG["MASK"]&0x01000000?false:true;
+    m_n106_3= (int)CONFIG["MASK"]&0x02000000?false:true;
+    m_n106_4= (int)CONFIG["MASK"]&0x04000000?false:true;
+    m_n106_5= (int)CONFIG["MASK"]&0x08000000?false:true;
+    m_n106_6= (int)CONFIG["MASK"]&0x10000000?false:true;
+    m_n106_7= (int)CONFIG["MASK"]&0x20000000?false:true;
+    m_n106_8= (int)CONFIG["MASK"]&0x40000000?false:true; 
     if (m_hWnd) UpdateData(false);
   }
   else if(m_hWnd)
@@ -103,25 +108,30 @@ void NSFMaskDialog::UpdateNSFPlayerConfig(bool b)
                (!m_fme7_1<<9) |
                (!m_fme7_2<<10) |
                (!m_fme7_3<<11) |
-               (!m_vrc6_1<<12) |
-               (!m_vrc6_2<<13) |
-               (!m_vrc6_3<<14) |
-               (!m_vrc7_1<<15) |
-               (!m_vrc7_2<<16) |
-               (!m_vrc7_3<<17) |
-               (!m_vrc7_4<<18) |
-               (!m_vrc7_5<<19) |
-               (!m_vrc7_6<<20) |
-               (!m_n106_1<<21) |
-               (!m_n106_2<<22) |
-               (!m_n106_3<<23) |
-               (!m_n106_4<<24) |
-               (!m_n106_5<<25) |
-               (!m_n106_6<<26) |
-               (!m_n106_7<<27) |
-               (!m_n106_8<<28);
+			   //(!m_fme7_4<<12) |
+               //(!m_fme7_5<<13) |
+               (!m_vrc6_1<<14) |
+               (!m_vrc6_2<<15) |
+               (!m_vrc6_3<<16) |
+               (!m_vrc7_1<<17) |
+               (!m_vrc7_2<<18) |
+               (!m_vrc7_3<<19) |
+               (!m_vrc7_4<<20) |
+               (!m_vrc7_5<<21) |
+               (!m_vrc7_6<<22) |
+               (!m_n106_1<<23) |
+               (!m_n106_2<<24) |
+               (!m_n106_3<<25) |
+               (!m_n106_4<<26) |
+               (!m_n106_5<<27) |
+               (!m_n106_6<<28) |
+               (!m_n106_7<<29) |
+               (!m_n106_8<<30);
     pm->cf->Notify(-1);
+	parent->UpdateNSFPlayerConfig(true);
   }
+
+
 
   if((int)CONFIG["MASK"]==0)
     m_reset.EnableWindow(false);

@@ -28,18 +28,24 @@ namespace xgm
     virtual bool GetKeyStatus()=0;
     // トーン番号
     virtual INT32 GetTone()=0;
+	virtual INT32 GetMisc()=0;
 
     // 周波数をノート番号に変換．0x60がo4c 0は無効
     static int GetNote(double freq)
+    {
+		return (int)GetFractionalNote(freq);
+    }
+
+	static double GetFractionalNote(double freq)
     {
       const double LOG2_440 = 8.7813597135246596040696824762152;
       const double LOG_2 = 0.69314718055994530941723212145818;
       const int NOTE_440HZ = 0x69;
 
       if(freq>1.0)
-        return (int)((12 * ( log(freq)/LOG_2 - LOG2_440 ) + NOTE_440HZ + 0.5));
+        return ((12 * ( log(freq)/LOG_2 - LOG2_440 ) + NOTE_440HZ + 0.5));
       else
-        return 0;
+        return 0.0;
     }
   };
 
@@ -111,6 +117,7 @@ namespace xgm
     double freq;
     bool key;
     INT32 tone;
+	INT32 misc;
     virtual IDeviceInfo *Clone(){ return new TrackInfoBasic(*this); }
     virtual INT32 GetOutput(){ return output; }
     virtual double GetFreqHz(){ return freq; }
@@ -118,7 +125,8 @@ namespace xgm
     virtual bool GetKeyStatus(){ return key; }
     virtual INT32 GetVolume(){ return volume; }
     virtual INT32 GetMaxVolume(){ return max_volume; }
-    virtual INT32 GetTone(){ return tone; };
+    virtual INT32 GetTone(){ return tone; }
+    virtual INT32 GetMisc(){ return misc; };
   };
 
 }// namespace xgm

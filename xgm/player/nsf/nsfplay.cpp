@@ -379,9 +379,9 @@ namespace xgm
     fds->SetMask( (*config)["MASK"].GetInt()>>5 );
     mmc5->SetMask((*config)["MASK"].GetInt()>>6 );
     fme7->SetMask((*config)["MASK"].GetInt()>>9 );
-    vrc6->SetMask((*config)["MASK"].GetInt()>>12);
-    vrc7->SetMask((*config)["MASK"].GetInt()>>15);
-    n106->SetMask((*config)["MASK"].GetInt()>>21);
+    vrc6->SetMask((*config)["MASK"].GetInt()>>14);
+    vrc7->SetMask((*config)["MASK"].GetInt()>>17);
+    n106->SetMask((*config)["MASK"].GetInt()>>23);
 
     vrc7->SetPatchSet((*config)["VRC7_PATCH"].GetInt());
 
@@ -449,7 +449,8 @@ namespace xgm
         int cpu_clocks = (int)(cpu_clock_rest);
         if (cpu_clocks > 0)
         {
-            UINT32 real_cpu_clocks = cpu.Exec ( cpu_clocks );
+			bool frameElapsed;
+            UINT32 real_cpu_clocks = cpu.Exec ( cpu_clocks, &frameElapsed );
             cpu_clock_rest -= (double)(real_cpu_clocks);
 
             // tick APU frame sequencer
@@ -486,7 +487,10 @@ namespace xgm
 
   void NSFPlayer::UpdateInfo()
   {
-    if(total_render%frame_render==0)
+	//this logic needs to run as though frame_render was 734.9706 exactly, instead of 735.
+	//long largetotalrender = total_render*10000L;
+	//if ((largetotalrender % 7349706L) < ((largetotalrender-10000L) % 7349706L)) //we just passed 0 and the previous number didn't
+    //if(total_render%frame_render==0)
     {
       int i;
 
@@ -567,7 +571,12 @@ namespace xgm
       int cpu_clocks = (int)(cpu_clock_rest);
       if (cpu_clocks > 0)
       {
-          UINT32 real_cpu_clocks = cpu.Exec ( cpu_clocks );
+		  bool frameElapsed;
+          UINT32 real_cpu_clocks = cpu.Exec ( cpu_clocks, &frameElapsed );
+		  if (frameElapsed)
+		  {
+			  UpdateInfo();
+		  }
           cpu_clock_rest -= (double)(real_cpu_clocks);
 
           // tick APU frame sequencer
@@ -576,7 +585,7 @@ namespace xgm
               mmc5->TickFrameSequence(real_cpu_clocks);
       }
 
-      UpdateInfo();
+      //UpdateInfo();
 
       // tick APU / expansions
       apu_clock_rest += apu_clock_per_sample;
@@ -781,15 +790,15 @@ namespace xgm
       fme7->SetMask((*config)["MASK"].GetInt()>>9);
       break;
     case VRC6:
-      vrc6->SetMask((*config)["MASK"].GetInt()>>12);
+      vrc6->SetMask((*config)["MASK"].GetInt()>>14);
       break;
     case VRC7:
-      vrc7->SetMask((*config)["MASK"].GetInt()>>15);
+      vrc7->SetMask((*config)["MASK"].GetInt()>>17);
       break;
     case N106:
       for (i = 0; i < NES_N106::OPT_END; i++)
         n106->SetOption (i, config->GetDeviceOption(id,i));
-      n106->SetMask((*config)["MASK"].GetInt()>>21);
+      n106->SetMask((*config)["MASK"].GetInt()>>23);
       break;
     default:
       break;
