@@ -31,7 +31,7 @@ KeyWindow::~KeyWindow()
 // キーボードを書く
 void KeyWindow::draw_keyboard(CDC* pDC, int x, int y, int nx, int ny)
 {
-	static int key[14] = {1,2,1,2,1,0,1,2,1,2,1,2,1,0};
+	static int key[14] = { 1,2,1,2,1,0,1,2,1,2,1,2,1,0 };
 	CRect rect;
 	int i;
 
@@ -142,7 +142,7 @@ void KeyWindow::draw_notes(CDC* pDC, int x, int y, int nx, int ny)
 		{
 			i = (*itr) & 0xFF;
 			int note = (int)m_nTrackFractionalNote[i][j];
-			int tbl[12] = {0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12};
+			int tbl[12] = { 0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12 };
 			int key = (tbl[note % 12] + (note / 12) * 14); //insert magic here
 			int higherkey;
 			int lowerkey;
@@ -161,7 +161,7 @@ void KeyWindow::draw_notes(CDC* pDC, int x, int y, int nx, int ny)
 				higherkey = key;
 			}
 
-			static int keys[14] = {1,2,1,2,1,0,1,2,1,2,1,2,1,0};
+			static int keys[14] = { 1,2,1,2,1,0,1,2,1,2,1,2,1,0 };
 			bool bothwhite = keys[lowerkey % 14] == 1 && keys[higherkey % 14] == 1;
 			bool higherblack = keys[lowerkey % 14] == 1 && keys[higherkey % 14] == 2;
 			//else lowerblack is true
@@ -203,7 +203,7 @@ void KeyWindow::draw_notes(CDC* pDC, int x, int y, int nx, int ny)
 
 void KeyWindow::KeyOn(int note, int color)
 {
-	int tbl[12] = {0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12};
+	int tbl[12] = { 0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12 };
 	if (note <= 0) return;
 	m_nKeyStatus[(tbl[note % 12] + (note / 12) * 14) & 0xFF] = 1;
 	m_nKeyColor[(tbl[note % 12] + (note / 12) * 14) & 0xFF] = color;
@@ -221,7 +221,7 @@ void KeyWindow::TrackOn(int track, int color, int volume, double fractionalNote,
 
 void KeyWindow::KeyOff(int note)
 {
-	int tbl[12] = {0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12};
+	int tbl[12] = { 0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12 };
 	if (note <= 0) return;
 	m_nKeyStatus[(tbl[note % 12] + (note / 12) * 14) & 0xFF] = 0;
 }
@@ -247,7 +247,7 @@ BEGIN_MESSAGE_MAP(KeyWindow, CDialog)
 	ON_WM_SIZE()
 	ON_WM_PAINT()
 	ON_WM_LBUTTONDBLCLK()
-	END_MESSAGE_MAP()
+END_MESSAGE_MAP()
 
 
 // KeyWindow メッセージ ハンドラ
@@ -285,6 +285,8 @@ void KeyWindow::OnSize(UINT nType, int cx, int cy)
 		CRect rect;
 		GetClientRect(rect);
 		int keyheight = rect.Height() - SynthesiaHeight();
+
+		// draw black background
 		m_keyDC.FillSolidRect(0, 0, rect.Width(), keyheight + 1, RGB(0, 0, 0));
 		m_memDC.FillSolidRect(0, keyheight - 1, rect.Width(), SynthesiaHeight(), RGB(0, 0, 0));
 

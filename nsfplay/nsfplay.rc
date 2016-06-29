@@ -2,8 +2,6 @@
 //
 #include "resource.h"
 
-#include "../xgm/version.h"
-
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -15,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Japanese resources
+// Japanese (Japan) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-#ifdef _WIN32
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -83,12 +79,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Digital Sound Antiques"
             VALUE "FileDescription", "NSFPlay"
-            VALUE "FileVersion", NSFPLAY_VERSION
+            VALUE "FileVersion", "2.4 Synthesia beta 4"
             VALUE "InternalName", "nsfplay.EXE"
             VALUE "LegalCopyright", "Public Domain Software"
             VALUE "OriginalFilename", "nsfplay.EXE"
             VALUE "ProductName", "NSFplay"
-            VALUE "ProductVersion", NSFPLAY_VERSION
+            VALUE "ProductVersion", "2.4 Synthesia beta 4"
         END
     END
     BLOCK "VarFileInfo"
@@ -105,28 +101,27 @@ END
 
 IDR_MANIFEST            RT_MANIFEST             "res\\nsfplay.manifest"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "About NSFPlay..."
 END
 
-#endif    // Japanese resources
+#endif    // Japanese (Japan) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -136,18 +131,31 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_MAINFRAME           ICON                    "res\\nsfplay.ico"
+
 IDI_FAMICOM             ICON                    "res\\nsfplug.ico"
+
 IDI_OPEN                ICON                    "res\\open.ico"
+
 IDI_PROP                ICON                    "res\\prop.ico"
+
 IDI_STOP                ICON                    "res\\stop.ico"
+
 IDI_PREV                ICON                    "res\\prev.ico"
+
 IDI_PLAY                ICON                    "res\\play.ico"
+
 IDI_NEXT                ICON                    "res\\next.ico"
+
 IDI_PAUSE               ICON                    "res\\pause.ico"
+
 IDI_ABOUT               ICON                    "res\\about.ico"
+
 IDI_CONFIG              ICON                    "res\\config.ico"
+
 IDI_VOLUME              ICON                    "res\\volume.ico"
+
 IDI_WAVEOUT             ICON                    "res\\waveout.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -160,14 +168,14 @@ CAPTION "About NSFplay"
 FONT 9, "MS UI Gothic", 0, 0, 0x1
 BEGIN
     ICON            IDI_MAINFRAME,IDC_STATIC,55,7,20,20
-    CTEXT           NSFPLAY_TITLE,IDC_STATIC,7,37,114,8,SS_NOPREFIX
+    CTEXT           "NSFPlay Synthesia 2.4 beta 4",IDC_STATIC,7,37,114,8,SS_NOPREFIX
     DEFPUSHBUTTON   "OK",IDOK,44,52,39,16,WS_GROUP
 END
 
 IDD_NSFPLAY_DIALOG DIALOGEX 0, 0, 247, 50
 STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_ACCEPTFILES | WS_EX_APPWINDOW
-CAPTION NSFPLAY_TITLE
+CAPTION "NSFPlay Synthesia 2.4 beta 4"
 FONT 8, "MS Sans Serif", 400, 0, 0x0
 BEGIN
     CTEXT           "",IDC_TITLE,5,3,237,9,SS_SUNKEN
@@ -195,7 +203,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -221,7 +229,7 @@ END
 // Accelerator
 //
 
-IDR_ACCELERATOR ACCELERATORS 
+IDR_ACCELERATOR ACCELERATORS
 BEGIN
     "B",            IDC_NEXT,               VIRTKEY, NOINVERT
     "X",            IDC_PLAY,               VIRTKEY, NOINVERT
@@ -230,7 +238,18 @@ BEGIN
     "C",            IDC_PAUSE,              VIRTKEY, NOINVERT
 END
 
-#endif    // English (U.S.) resources
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_NSFPLAY_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
