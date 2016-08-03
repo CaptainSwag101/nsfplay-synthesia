@@ -7,7 +7,7 @@
 namespace xgm
 {
   /**
-   * シーケンス型演奏データ
+   * Sequence type performance data
    */
   class SoundData
   {
@@ -15,45 +15,45 @@ namespace xgm
     SoundData(){};
     virtual ~SoundData(){};
     /**
-     * バイナリイメージからの読み込み
+     * Read from the binary image
      *
-     * @param image バイナリイメージへのポインタ
-     * @param size  イメージのサイズ
-     * @return 成功時 true 失敗時 false
+     * @param image A pointer to a binary image
+     * @param size  The size of the image
+     * @return Success true failure false
      */
     virtual bool Load(UINT8 *data, UINT32 size){ return false; }
 
     /**
-     * ファイルからの読み込み
-     * @param fn ファイル名（またはファイル情報を示す文字列）へのポインタ
+     * Read from a file
+     * @param fn Pointer of the file name to (or a string that indicates the file information)
      */
     virtual bool LoadFile(const char *fn){ return false; }
 
     /**
-     * タイトルの取得
-     * @return タイトル情報
+     * Acquisition of title
+     * @return Title information
      */
     virtual char *GetTitleString(const char *format=NULL){ return ""; }
 
     /**
-     * タイトルの設定
-     * @param title 新しいタイトルへのポインタ(255文字まで)
+     * title setting
+     * @param title A pointer to the new title (up to 255 characters)
      */
     virtual void SetTitleString(char *title){}
 
     /**
-     * 演奏時間(ms)の取得
+     * Get the playback time (ms)
      */
     virtual int GetLength(){ return 3*60*1000; }
 
     /**
-     * 演奏時間(ms)の設定
+     * Set the playback length (ms)
      */
     virtual void SetLength(int time_in_ms){}
   };
 
   /**
-   * 複数曲入り演奏データ
+   * Multiple songs containing performance data
    */
   class SoundDataMSP : public SoundData
   {

@@ -1,4 +1,4 @@
-#include <assert.h>
+ï»¿#include <assert.h>
 #include <typeinfo>
 #include "nsfplay.h"
 
@@ -25,7 +25,7 @@ namespace xgm
     dmc->SetAPU(apu); // set APU
     mmc5->SetCPU(&cpu); // MMC5 PCM read action requires CPU read access
 
-    /* ƒAƒ“ƒv©ƒtƒBƒ‹ƒ^©ƒŒ[ƒgƒRƒ“ƒo[ƒ^©‰¹Œ¹ ‚ğÚ‘± */
+    /* Amplifier â† filter â† rate converter â† connect the sound source */
     for (int i = 0; i < NES_DEVICE_MAX; i++)
     {
       rconv[i].Attach (sc[i]);
@@ -245,7 +245,7 @@ namespace xgm
     {
       int quality = config->GetDeviceConfig(i,"QUALITY");
 
-      // ƒŒ[ƒgƒRƒ“ƒo[ƒ^‚ğg—p‚·‚é
+      // To use the rate converter
       int MULT[NES_DEVICE_MAX][4] = { 
         1, 5, 8, 20, // APU1
         1, 5, 8, 20, // DMC
@@ -287,10 +287,10 @@ namespace xgm
       }
       else
       {
-        // ƒŒ[ƒgƒRƒ“ƒo[ƒ^‚Íg—p‚µ‚È‚¢
+        // Rate converter is not used
         filter[i].Attach (sc[i]);
       }
-      // ƒtƒBƒ‹ƒ^“®ìü”g”‚Ìİ’è
+      // Set the filter operating frequency
       filter[i].SetRate(rate);
       filter[i].Reset();
     }
@@ -321,7 +321,7 @@ namespace xgm
     playtime_detected = false;
     click_mode = PRE_CLICK;
     total_render = 0;
-    frame_render = (int)(rate)/60; // ‰‰‘tî•ñ‚ğXV‚·‚éüŠú
+    frame_render = (int)(rate)/60; // Period to update the performance information
     apu_clock_rest = 0.0;
     cpu_clock_rest = 0.0;
 
@@ -343,15 +343,15 @@ namespace xgm
     if (logcpu->GetLogLevel() > 0)
         logcpu->Begin(GetTitleString());
 
-    // ‰‰‘tŒã‚ÉRAM‹óŠÔ‚ğ”j‰ó‚³‚ê‚éê‡‚ª‚ ‚é‚Ì‚ÅCÄƒ[ƒh
+    // Since the data in RAM may be cleared after playing, we reload here
     Reload ();
-    // ƒŒ[ƒg‚Ìİ’è‚ÍReset‚æ‚è‘O‚És‚Á‚Ä‚¨‚­‚±‚Æ
+    // Set the frequency rate before we call Reset()
     SetPlayFreq (rate);
-    // ‘S‚Ä‚ÌƒRƒ“ƒtƒBƒOƒŒ[ƒVƒ‡ƒ“‚ğ“K—p
+    // Apply the configuration
     config->Notify (-1);
-    // ƒoƒX‚ğƒŠƒZƒbƒg 
+    // Reset the bus
     stack.Reset ();
-    // CPUƒŠƒZƒbƒg‚Í•K‚¸ƒoƒX‚æ‚èŒãid—vj
+    // Always reset the CPU later than the bus (important!)
     cpu.Reset ();
 
     double speed;
@@ -373,7 +373,7 @@ namespace xgm
 
     cpu.Start (nsf->init_address, nsf->play_address, speed, song, (region == REGION_PAL)?1:0);
 
-    // ƒ}ƒXƒNXV
+    // Update mask
     apu->SetMask( (*config)["MASK"].GetInt()    );
     dmc->SetMask( (*config)["MASK"].GetInt()>>2 );
     fds->SetMask( (*config)["MASK"].GetInt()>>5 );

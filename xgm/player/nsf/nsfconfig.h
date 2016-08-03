@@ -4,7 +4,7 @@
 
 namespace xgm
 {
-  /** デバイス毎の通し番号 */
+  /** Serial number of each device */
   enum DeviceCode
   { APU = 0, DMC, FME7, MMC5, N106, VRC6, VRC7, FDS, NES_DEVICE_MAX };
 
@@ -50,7 +50,7 @@ namespace xgm
       return data[str];
     }
 
-    /** デバイス毎の名前 */
+    /** Name of each device */
     static char *dname[NES_DEVICE_MAX];
 
     // for channel/pan/mix

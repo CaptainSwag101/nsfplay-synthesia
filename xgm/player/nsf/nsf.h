@@ -15,7 +15,7 @@ namespace xgm
   const unsigned int NSFE_ENTRIES = 256;
 
   /**
-   * NSFファイル型
+   * NSF file type
    */
   class NSF : public SoundDataMSP
   {
@@ -57,30 +57,30 @@ namespace xgm
     int nsfe_plst_size;
     NSFE_Entry nsfe_entry[NSFE_ENTRIES];
 
-    /** 現在選択中の曲番号 */
+    /** Currently selected song number */
     int song;
-    /** プレイリストから読んだデータならtrue */
+    /** If reading data from the playlist, this is true */
     bool playlist_mode;
-    /** 演奏時間 */
+    /** Playback time */
     int time_in_ms, default_playtime;
-    /** ループ時間 */
+    /** Loop time */
     int loop_in_ms;
-    /** フェード時間 */
+    /** Fade time */
     int fade_in_ms, default_fadetime;
-    /** ループ回数 */
+    /** Loop count */
     int loop_num, default_loopnum;
-    /** 演奏時間が不明の時true（デフォルトの演奏時間を使用）*/
+    /** True if song length is unknown, and we are using the default playback time */
     bool playtime_unknown;
     bool title_unknown;
 
       NSF ();
      ~NSF ();
     /**
-     * NSFファイルの読み込み
+     * Reading the NSF file
      *
-     * @param image バイナリイメージへのポインタ
-     * @param size  イメージのサイズ
-     * @return 成功時 true 失敗時 false
+     * @param image A pointer to a binary image
+     * @param size Size of the binary image
+     * @return Success true, failure false
      */
 
     // loads file (playlist or NSF or NSFe)
@@ -94,9 +94,9 @@ namespace xgm
 
     void DebugOut ();
     /**
-     * タイトル文字列の取得
+     * Get the title string
      *
-     * @return タイトル文字列 (作曲者 - タイトル)
+     * @return Title string (composer - title)
      */
     char *GetTitleString (const char *format=NULL, int song=-1);
     char *GetPlaylistString (const char *format, bool b);

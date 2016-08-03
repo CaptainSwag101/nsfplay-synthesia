@@ -1,53 +1,53 @@
-// stdafx.h : 標準のシステム インクルード ファイルのインクルード ファイル、または
-// 参照回数が多く、かつあまり変更されない、プロジェクト専用のインクルード ファイル
-// を記述します。
+// Stdafx.h: include file for standard system include files, 
+// or a lot reference number of times, and not so much change,
+// describes the project dedicated include files.
 
 #pragma once
 
 #ifndef VC_EXTRALEAN
-#define VC_EXTRALEAN		// Windows ヘッダーから使用されていない部分を除外します。
+#define VC_EXTRALEAN // exclude the part that is not being used from Windows header.
 #endif
 
-// 下で指定された定義の前に対象プラットフォームを指定しなければならない場合、以下の定義を変更してください。
-// 異なるプラットフォームに対応する値に関する最新情報については、MSDN を参照してください。
-#ifndef WINVER				// Windows 95 および Windows NT 4 以降のバージョンに固有の機能の使用を許可します。
-#define WINVER 0x0501		// これを Windows 98 および Windows 2000 またはそれ以降のバージョン向けに適切な値に変更してください。
+If before the specified definition must specify the target platform under //, please change the following definitions.
+For the latest information about // values ??corresponding to the different platforms, please refer to the MSDN.
+The version of the #ifndef WINVER // Windows 95 and Windows NT 4 or later to allow the use of specific features.
+Please change to an appropriate value to #define WINVER 0x0501 // This is Windows 98 and Windows 2000 or a later version for.
 #endif
 
-#ifndef _WIN32_WINNT		// Windows NT 4 以降のバージョンに固有の機能の使用を許可します。
-#define _WIN32_WINNT 0x0501	// これを Windows 2000 またはそれ以降のバージョン向けに適切な値に変更してください。
-#endif						
-
-#ifndef _WIN32_WINDOWS		// Windows 98 以降のバージョンに固有の機能の使用を許可します。
-#define _WIN32_WINDOWS 0x0501 // これを Windows Me またはそれ以降のバージョン向けに適切な値に変更してください。
+The version of the #ifndef _WIN32_WINNT // Windows NT 4 or later to allow the use of specific features.
+Please change to an appropriate value to #define _WIN32_WINNT 0x0501 // this Windows 2000 or a later version for.
 #endif
 
-#ifndef _WIN32_IE			// IE 4.0 以降のバージョンに固有の機能の使用を許可します。
-#define _WIN32_IE 0x0500	// これを IE 5.0  またはそれ以降のバージョン向けに適切な値に変更してください。
+The version of the #ifndef _WIN32_WINDOWS // Windows 98 or later to allow the use of specific features.
+Please change to an appropriate value to #define _WIN32_WINDOWS 0x0501 // This is Windows Me or later versions for.
 #endif
 
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS	// 一部の CString コンストラクタは明示的です。
+The version of the #ifndef _WIN32_IE // IE 4.0 and later allow the use of specific features.
+Please change to an appropriate value to #define _WIN32_IE 0x0500 // This IE 5.0 or a later version for.
+#endif
 
-#include <afxwin.h>         // MFC のコアおよび標準コンポーネント
-#include <afxext.h>         // MFC の拡張部分
+CString constructor of #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS // part is explicitly.
+
+#include <afxwin.h> // core and standard component of MFC
+#include <afxext.h> // extension of the MFC
 
 #ifndef _AFX_NO_OLE_SUPPORT
-#include <afxole.h>         // MFC OLE クラス
-#include <afxodlgs.h>       // MFC OLE ダイアログ クラス
-#include <afxdisp.h>        // MFC オートメーション クラス
+#include <afxole.h> // MFC OLE class
+#include <afxodlgs.h> // MFC OLE dialog class
+#include <afxdisp.h> // MFC automation class
 #endif // _AFX_NO_OLE_SUPPORT
 
 #ifndef _AFX_NO_DB_SUPPORT
-#include <afxdb.h>			// MFC ODBC データベース クラス
+#include <afxdb.h> // MFC ODBC database classes
 #endif // _AFX_NO_DB_SUPPORT
 
 #ifndef _AFX_NO_DAO_SUPPORT
-#include <afxdao.h>			// MFC DAO データベース クラス
+#include <afxdao.h> // MFC DAO database class
 #endif // _AFX_NO_DAO_SUPPORT
 
-#include <afxdtctl.h>		// MFC の Internet Explorer 4 コモン コントロール サポート
+#include <afxdtctl.h> // Internet Explorer 4 Common control support of MFC
 #ifndef _AFX_NO_AFXCMN_SUPPORT
-#include <afxcmn.h>			// MFC の Windows コモン コントロール サポート
+#include <afxcmn.h> // MFC of the Windows Common Controls support
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
 #include <afxtempl.h>

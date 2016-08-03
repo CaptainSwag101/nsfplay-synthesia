@@ -45,13 +45,13 @@ namespace xgm
     double cpu_clock_rest;
     double apu_clock_rest;
 
-    int time_in_ms;             // 演奏した時間(ms)
-    bool playtime_detected;     // 演奏時間が検出されたらtrue
+    int time_in_ms;             // Playback time (ms)
+    bool playtime_detected;     // True if the play time was detected
 
-    void Reload ();
-    void DetectLoop ();
-    void DetectSilent ();
-    void CheckTerminal ();
+    void Reload();
+    void DetectLoop();
+    void DetectSilent();
+    void CheckTerminal();
     void UpdateInfo();
 
   public:
@@ -64,19 +64,19 @@ namespace xgm
     NES_MEM mem;
     NES_BANK bank;
 
-    ISoundChip *sc[NES_DEVICE_MAX];      // サウンドチップのインスタンス
-    RateConverter rconv[NES_DEVICE_MAX]; // サンプリングレートコンバータ
-    Filter filter[NES_DEVICE_MAX];       // ローパスフィルター
-    Amplifier amp[NES_DEVICE_MAX];       // アンプ
-    DCFilter dcf;                        // 最終出力段に掛ける直流フィルタ
-    Filter lpf;                          // 最終出力に掛けるローパスフィルタ
-    Compressor cmp;                      // 最終出力段に掛けるコンプレッサ
-    ILoopDetector *ld;                   // ループ検出器
+    ISoundChip *sc[NES_DEVICE_MAX];      // Instance of the sound chip
+    RateConverter rconv[NES_DEVICE_MAX]; // Sample rate converter
+    Filter filter[NES_DEVICE_MAX];       // Low-pass converter
+    Amplifier amp[NES_DEVICE_MAX];       // Amplifier
+    DCFilter dcf;                        // DC filter to be applied to the final output stage
+    Filter lpf;                          // A low-pass filter to be applied to the final output
+    Compressor cmp;                      // Compressor to be applied to the final output stage
+    ILoopDetector *ld;                   // Loop detector
     CPULogger *logcpu;                   // Logs CPU to file
     EchoUnit echo;
-    MedianFilter *mfilter;               // プチノイズ対策のメディアンフィルタ
+    MedianFilter *mfilter;               // Median filter of small noise measurements
 
-    // トラック番号の列挙
+    // Enumeration of the track number
     enum {
       APU1_TRK0=0, APU1_TRK1, 
       APU2_TRK0, APU2_TRK1, APU2_TRK2,
@@ -88,13 +88,13 @@ namespace xgm
       N106_TRK0, N106_TRK1, N106_TRK2, N106_TRK3, N106_TRK4, N106_TRK5, N106_TRK6, N106_TRK7,
       NES_TRACK_MAX
     };
-    InfoBuffer infobuf[NES_TRACK_MAX];   // 各トラックの情報を保存
+    InfoBuffer infobuf[NES_TRACK_MAX];   // Save the information of each track
     
-    int total_render; // これまでに生成した波形のバイト数
-    int frame_render; // １フレーム分のバイト数
-    int frame_in_ms;  // １フレームの長さ(ms)
+    int total_render; // The number of bytes of this up to the generated waveform
+    int frame_render; // The number of bytes in 1 frame
+    int frame_in_ms;  // Length of one frame (ms)
 
-    // 各サウンドチップのエイリアス参照
+    // Alias reference of each sound chip
     NES_APU *apu;
     NES_DMC *dmc;
     NES_VRC6 *vrc6;
@@ -107,68 +107,68 @@ namespace xgm
 
   public:
     NSF *nsf;
-    NSFPlayer ();
-    ~NSFPlayer ();
+    NSFPlayer();
+    ~NSFPlayer();
 
-    /** コンフィグ情報のセット */
+    /** Set the configuration information */
     virtual void SetConfig(PlayerConfig *pc) ;
 
-    /** データをロードする */
-    virtual bool Load (SoundData * sdat);
+    /** Loads the data */
+    virtual bool Load(SoundData * sdat);
 
-    /** 再生周波数を設定する */
-    virtual void SetPlayFreq (double);
+    /** Sets the playback frequency */
+    virtual void SetPlayFreq(double);
 
     /**
      * Number of channels to output.
      */
     virtual void SetChannels(int);
 
-    /** リセットする．前の演奏でデータの自己書き換えが発生していても修復しない． */
-    virtual void Reset ();
+    /** Reset. Self rewriting of data is not restored even if generated in the previous performances. */
+    virtual void Reset();
 
-    /** 現在演奏中の曲番号を返す */
-    virtual int GetSong ();
+    /** Returns the number of the song currently playing */
+    virtual int GetSong();
 
-    /** フェードアウトを開始する */
-    virtual void FadeOut (int fade_in_ms);
+    /** Starts the fade-out */
+    virtual void FadeOut(int fade_in_ms);
 
-    /** 演奏する曲番号を設定する */
-    virtual bool SetSong (int s);
-    virtual bool PrevSong (int s);
-    virtual bool NextSong (int s);
+    /** Sets the song number to be played */
+    virtual bool SetSong(int s);
+    virtual bool PrevSong(int s);
+    virtual bool NextSong(int s);
 
-    /** レンダリングを行う */
-    virtual UINT32 Render (INT16 * b, UINT32 length);
+    /** Renders the data */
+    virtual UINT32 Render(INT16 * b, UINT32 length);
 
-    /** レンダリングをスキップする */
-    virtual UINT32 Skip (UINT32 length);
+    /** Skips the rendering */
+    virtual UINT32 Skip(UINT32 length);
 
-    /** 曲名を取得する */
-    virtual char *GetTitleString ();
+    /** Gets the song title */
+    virtual char *GetTitleString();
 
-    /** 演奏時間を取得する */
-    virtual int GetLength ();
+    /** Gets the playback length */
+    virtual int GetLength();
 
-    /** 演奏時間が自動検出されたかどうかをチェックする */
-    virtual bool IsDetected ();
+    /** Checks whether the playback length was automatically detected */
+    virtual bool IsDetected();
 
-    /** 演奏が停止したかどうかをチェックする */
-    virtual bool IsStopped ();
+    /** Checks whether playback is stopped */
+    virtual bool IsStopped();
 
-    /** 現在のNESメモリ状況を文字列として獲得する */
-    virtual void GetMemoryString (char *buf);   // Memory Dump as String
+    /** Dumps the current NES memory state as a string */
+    virtual void GetMemoryString(char *buf);   // Memory Dump as String
 
-    /** 現在のNESメモリ状況を獲得する */
-    virtual void GetMemory (UINT8 * buf);       // Memory Dump
+    /** Dumps the current NES memory state */
+    virtual void GetMemory(UINT8 * buf);       // Memory Dump
 
-    /** コンフィグレーションの更新情報通知を受け取るコールバック */
-    virtual void Notify (int id);
+    /** Callback to receive the notification to update the configuration information */
+    virtual void Notify(int id);
 
     // Notify for panning
-    virtual void NotifyPan (int id);
+    virtual void NotifyPan(int id);
 
-    /** time_in_ms時点でのデバイス情報を取得する */
+    /** Gets the device information in time_in_ms time */
     virtual IDeviceInfo *GetInfo(int time_in_ms, int device_id);
 
     /** Whether to use PAL/NTSC/Dendy based on flags and REGION config */
