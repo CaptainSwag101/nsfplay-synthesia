@@ -8,25 +8,24 @@
 #define VC_EXTRALEAN // exclude the part that is not being used from Windows header.
 #endif
 
-If before the specified definition must specify the target platform under //, please change the following definitions.
-For the latest information about // values ??corresponding to the different platforms, please refer to the MSDN.
-The version of the #ifndef WINVER // Windows 95 and Windows NT 4 or later to allow the use of specific features.
-Please change to an appropriate value to #define WINVER 0x0501 // This is Windows 98 and Windows 2000 or a later version for.
+
+#ifndef WINVER // Windows 95 and Windows NT 4 or later to allow the use of specific features.
+#define WINVER 0x0501 // This is Windows 98 and Windows 2000 or a later version for.
 #endif
 
-The version of the #ifndef _WIN32_WINNT // Windows NT 4 or later to allow the use of specific features.
-Please change to an appropriate value to #define _WIN32_WINNT 0x0501 // this Windows 2000 or a later version for.
+#ifndef _WIN32_WINNT // Windows NT 4 or later to allow the use of specific features.
+#define _WIN32_WINNT 0x0501 // this Windows 2000 or a later version for.
 #endif
 
-The version of the #ifndef _WIN32_WINDOWS // Windows 98 or later to allow the use of specific features.
-Please change to an appropriate value to #define _WIN32_WINDOWS 0x0501 // This is Windows Me or later versions for.
+#ifndef _WIN32_WINDOWS // Windows 98 or later to allow the use of specific features.
+#define _WIN32_WINDOWS 0x0501 // This is Windows Me or later versions for.
 #endif
 
-The version of the #ifndef _WIN32_IE // IE 4.0 and later allow the use of specific features.
-Please change to an appropriate value to #define _WIN32_IE 0x0500 // This IE 5.0 or a later version for.
+#ifndef _WIN32_IE // IE 4.0 and later allow the use of specific features.
+#define _WIN32_IE 0x0500 // This IE 5.0 or a later version for.
 #endif
 
-CString constructor of #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS // part is explicitly.
+#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS // part is explicitly.
 
 #include <afxwin.h> // core and standard component of MFC
 #include <afxext.h> // extension of the MFC
