@@ -1,39 +1,39 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{c598e148-087e-40d1-9426-b7ed34c20add}</UniqueIdentifier>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{aaa6c01d-bd75-4464-a3bd-03d23748158b}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{31afc0b9-d2ac-4c2b-9c9e-4722182289cf}</UniqueIdentifier>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{577a27ff-8c32-4afa-9e5d-8a8c021da449}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{73c2223c-44ad-4451-bce1-985d86ce0f6f}</UniqueIdentifier>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{d62b1273-69c5-412d-b10e-d7256470d18a}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="emu_outdisk.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="emu_outmod.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="emu_winamp.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="emu_outdisk.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="emu_outmod.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="emu_winamp.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

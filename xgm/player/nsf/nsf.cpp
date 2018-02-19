@@ -422,7 +422,7 @@ static int is_sjis_prefix(int c)
       return false;
 
     version = image[0x05];
-    songs = image[0x06];
+    total_songs = songs = image[0x06];
     start = image[0x07];
     load_address = image[0x08] | (image[0x09] << 8);
     init_address = image[0x0a] | (image[0x0B] << 8);
@@ -532,6 +532,7 @@ static int is_sjis_prefix(int c)
           soundchip    = chunk[0x07];
           songs        = chunk[0x08];
           start        = chunk[0x09] + 1; // note NSFe is 0 based, unlike NSF
+          total_songs  = songs;
 
           // NSFe doesn't allow custom speeds
           speed_ntsc = 0x4100; // 60.09Hz
@@ -583,11 +584,23 @@ static int is_sjis_prefix(int c)
         {
           if (!info)
             return false;
+          if (chunk_size < 8)
+            return false;
 
           for (unsigned int i=0; i < 8 && i < chunk_size; ++i)
           {
             bankswitch[i] = chunk[i];
           }
+        }
+        else if (!strcmp(cid, "RATE"))
+        {
+          if (!info)
+            return false;
+          if (chunk_size < 4)
+            return false;
+
+          speed_ntsc = chunk[0] | (chunk[1] << 8);
+          speed_pal  = chunk[2] | (chunk[3] << 8);
         }
         else if (!strcmp(cid, "auth"))
         {

@@ -1,259 +1,259 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="HTML Help Files">
-      <UniqueIdentifier>{91a295eb-4844-44b5-a85e-64aa246c9ced}</UniqueIdentifier>
-      <Extensions>hhp;hhk;hhc;gif;jpg</Extensions>
-    </Filter>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{f562fd2d-d6b6-47e4-945c-b161e7f26174}</UniqueIdentifier>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{b3a73672-2549-4d82-a265-0c3d6b41f755}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{1d7a8fae-142a-4255-b79a-167963070d19}</UniqueIdentifier>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{0c7fea2c-c326-4ae1-8eab-4604f38ccd99}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{27f31ccb-6cdf-43ac-99e7-6447885d8b93}</UniqueIdentifier>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{db8aafd7-32b7-448e-96dd-9b31830758e9}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
-    <Filter Include="Resource Files\HTML ヘルプ トピック">
-      <UniqueIdentifier>{84b794a8-be91-4982-a93a-b2f63a65b970}</UniqueIdentifier>
+    <Filter Include="リソース ファイル\HTML ヘルプ トピック">
+      <UniqueIdentifier>{630396d0-8d8f-4a72-be85-76b0ceedf2bb}</UniqueIdentifier>
       <Extensions>htm;html</Extensions>
+    </Filter>
+    <Filter Include="HTML ヘルプ ファイル">
+      <UniqueIdentifier>{83824f85-e273-44cc-9d68-aa1abd1697b3}</UniqueIdentifier>
+      <Extensions>hhp;hhk;hhc;gif;jpg</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KeyDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="KeyHeader.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="KeyWindow.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="nsf_setup.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFApuPanel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFAudioPanel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFConfigDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFConfigPageDevice.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFConfigPageMain.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFDialogs.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFDmcPanel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFEasyDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFFdsPanel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFInfoDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFMaskDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFMemoryDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFMixerDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFMixerPanel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFMMC5Panel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFN106Panel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFPanDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFPanPanel.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFPresetDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFTrackDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="NSFTrackSetupDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="PresetManager.cpp">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="nsf_setup.def">
-      <Filter>Source Files</Filter>
+      <Filter>ソース ファイル</Filter>
     </None>
     <None Include="hlp\intro.htm">
-      <Filter>Resource Files\HTML ヘルプ トピック</Filter>
+      <Filter>リソース ファイル\HTML ヘルプ トピック</Filter>
     </None>
     <None Include="hlp\nsfplug.hhc">
-      <Filter>HTML Help Files</Filter>
+      <Filter>HTML ヘルプ ファイル</Filter>
     </None>
     <None Include="nsfplug.hhk">
-      <Filter>HTML Help Files</Filter>
+      <Filter>HTML ヘルプ ファイル</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KeyDialog.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="KeyHeader.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="KeyWindow.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="nsf_setup.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFApuPanel.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFAudioPanel.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFConfigDialog.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFConfigPageDevice.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFConfigPageMain.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFDialog.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFDialogs.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFDmcPanel.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFEasyDialog.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFFdsPanel.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFInfoDialog.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFMaskDialog.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFMemoryDialog.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFMixerDialog.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFMixerPanel.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFMMC5Panel.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFN106Panel.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFPanDialog.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFPanPanel.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="nsfplug_ui.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFPresetDialog.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFTrackDialog.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="NSFTrackSetupDialog.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="PresetManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\ascii.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="res\bitmap1.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="res\digit.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="ico00001.ico">
-      <Filter>Resource Files</Filter>
+      <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="icon1.ico">
-      <Filter>Resource Files</Filter>
+      <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="icon2.ico">
-      <Filter>Resource Files</Filter>
+      <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="res\keyboard.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="res\keyheader.bmp">
-      <Filter>Resource Files</Filter>
+      <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="res\nsf.ico">
-      <Filter>Resource Files</Filter>
+      <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="nsfplug.ico">
-      <Filter>Resource Files</Filter>
+      <Filter>リソース ファイル</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="nsf_setup.rc">
-      <Filter>Resource Files</Filter>
+      <Filter>リソース ファイル</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="hlp\nsfplug.hhp">
-      <Filter>HTML Help Files</Filter>
+      <Filter>HTML ヘルプ ファイル</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

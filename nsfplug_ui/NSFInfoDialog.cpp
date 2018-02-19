@@ -1,4 +1,4 @@
-// NSFInfoDialog.cpp : ƒCƒ“ƒvƒŠƒƒ“ƒe[ƒVƒ‡ƒ“ ƒtƒ@ƒCƒ‹
+// NSFInfoDialog.cpp : ï¿½Cï¿½ï¿½ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½eï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ ï¿½tï¿½@ï¿½Cï¿½ï¿½
 //
 #include "stdafx.h"
 #include "NSFDialogs.h"
@@ -11,7 +11,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// NSFInfoDialog ƒ_ƒCƒAƒƒO
+// NSFInfoDialog ï¿½_ï¿½Cï¿½Aï¿½ï¿½ï¿½O
 
 
 NSFInfoDialog::NSFInfoDialog(CWnd* pParent /*=NULL*/)
@@ -84,7 +84,7 @@ END_MESSAGE_MAP()
 
 
 /////////////////////////////////////////////////////////////////////////////
-// NSFInfoDialog ‚Ì‹@”
+// NSFInfoDialog ï¿½Ì‹@ï¿½
 void NSFInfoDialog::SetInfo(NSF *nsf)
 {
 	CString ss;
@@ -112,7 +112,7 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
 	m_songslider.SetLineSize(1);
 
 	nsf_copy = (*nsf);
-	nsf_copy.body = NULL; // ƒwƒbƒ_‚Ì‚ÝƒRƒs[  
+	nsf_copy.body = NULL; // ï¿½wï¿½bï¿½_ï¿½Ì‚ÝƒRï¿½sï¿½[  
 	nsf_copy.nsfe_image = NULL;
 	ntag.SetNSF(&nsf_copy);
 
@@ -185,21 +185,21 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
 		ss.Format("Ripper: %s\r\n", nsf->ripper);
 		m_info += ss;
 	}
-
-	for (unsigned int i = 0; i < nsf->songs; ++i)
-	{
-		if (nsf->nsfe_entry[i].tlbl[0] != 0 ||
-			nsf->nsfe_entry[i].time != -1 ||
-			nsf->nsfe_entry[i].fade != -1)
-		{
-			ss.Format("NSFe track %d: %s, %d, %d\r\n",
-				i,
-				nsf->nsfe_entry[i].tlbl,
-				nsf->nsfe_entry[i].time,
-				nsf->nsfe_entry[i].fade);
-			m_info += ss;
-		}
-	}
+    
+    for (unsigned int i = 0; i < nsf->total_songs; ++i)
+    {
+        if (nsf->nsfe_entry[i].tlbl[0] != 0  ||
+            nsf->nsfe_entry[i].time    != -1 ||
+            nsf->nsfe_entry[i].fade    != -1 )
+        {
+            ss.Format("NSFe track %d: %s, %d, %d\r\n",
+                i,
+                nsf->nsfe_entry[i].tlbl,
+                nsf->nsfe_entry[i].time,
+                nsf->nsfe_entry[i].fade);
+            m_info += ss;
+        }
+    }
 
 	if (nsf->nsfe_plst)
 	{
@@ -260,7 +260,7 @@ void NSFInfoDialog::SetInfo(char *fn)
 	SetInfo(&nsf);
 }
 
-// ƒvƒŒƒCƒŠƒXƒg¶¬
+// ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½
 void NSFInfoDialog::GeneratePlaylist(bool clear)
 {
 	if (ntag.sdat == NULL)
@@ -331,7 +331,7 @@ void NSFInfoDialog::GeneratePlaylist(bool clear)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// NSFInfoDialog ƒƒbƒZ[ƒW ƒnƒ“ƒhƒ‰
+// NSFInfoDialog ï¿½ï¿½ï¿½bï¿½Zï¿½[ï¿½W ï¿½nï¿½ï¿½ï¿½hï¿½ï¿½
 
 void NSFInfoDialog::OnNewpls()
 {
@@ -382,8 +382,8 @@ BOOL NSFInfoDialog::OnInitDialog()
 		menu->EnableMenuItem(ID_DELONE, true ? MF_ENABLED : MF_GRAYED);
 		menu->EnableMenuItem(ID_DELALL, true ? MF_ENABLED : MF_GRAYED);
 	}
-	return TRUE;  // ƒRƒ“ƒgƒ[ƒ‹‚ÉƒtƒH[ƒJƒX‚ðÝ’è‚µ‚È‚¢‚Æ‚«A–ß‚è’l‚Í TRUE ‚Æ‚È‚è‚Ü‚·
-					// —áŠO: OCX ƒvƒƒpƒeƒB ƒy[ƒW‚Ì–ß‚è’l‚Í FALSE ‚Æ‚È‚è‚Ü‚·
+	return TRUE;  // ï¿½Rï¿½ï¿½ï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Éƒtï¿½Hï¿½[ï¿½Jï¿½Xï¿½ï¿½Ý’è‚µï¿½È‚ï¿½ï¿½Æ‚ï¿½ï¿½Aï¿½ß‚ï¿½lï¿½ï¿½ TRUE ï¿½Æ‚È‚ï¿½Ü‚ï¿½
+					// ï¿½ï¿½O: OCX ï¿½vï¿½ï¿½ï¿½pï¿½eï¿½B ï¿½yï¿½[ï¿½Wï¿½Ì–ß‚ï¿½lï¿½ï¿½ FALSE ï¿½Æ‚È‚ï¿½Ü‚ï¿½
 }
 
 void NSFInfoDialog::OnSave()
@@ -468,13 +468,13 @@ void NSFInfoDialog::OnNext()
 void NSFInfoDialog::OnDelall()
 {
 	if (ntag.ClearTag() == 0)
-		MessageBox("‚±‚Ìƒ^ƒOî•ñ‚ÍÁ‹Ž‚Å‚«‚Ü‚¹‚ñ");
+		MessageBox("ï¿½ï¿½ï¿½Ìƒ^ï¿½Oï¿½ï¿½ï¿½Íï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½");
 }
 
 void NSFInfoDialog::OnDelone()
 {
 	if (ntag.InitTagItem(m_song - 1, CONFIG["TITLE_FORMAT"]) == 0)
-		MessageBox("‚±‚Ìƒ^ƒOî•ñ‚ÍÁ‹Ž‚Å‚«‚Ü‚¹‚ñ");
+		MessageBox("ï¿½ï¿½ï¿½Ìƒ^ï¿½Oï¿½ï¿½ï¿½Íï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½");
 }
 
 void NSFInfoDialog::OnReadtag()
@@ -505,7 +505,7 @@ void NSFInfoDialog::OnTrkinfo()
 
 void NSFInfoDialog::OnStnClickedArtist()
 {
-	// TODO : ‚±‚±‚ÉƒRƒ“ƒgƒ[ƒ‹’Ê’mƒnƒ“ƒhƒ‰ ƒR[ƒh‚ð’Ç‰Á‚µ‚Ü‚·B
+	// TODO : ï¿½ï¿½ï¿½ï¿½ï¿½ÉƒRï¿½ï¿½ï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ê’mï¿½nï¿½ï¿½ï¿½hï¿½ï¿½ ï¿½Rï¿½[ï¿½hï¿½ï¿½Ç‰ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
 }
 
 void NSFInfoDialog::OnDropFiles(HDROP hDropInfo)

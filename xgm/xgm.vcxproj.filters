@@ -2,52 +2,52 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="include">
-      <UniqueIdentifier>{96438093-363d-4b33-92ff-9743798d9f04}</UniqueIdentifier>
+      <UniqueIdentifier>{c7f1cbab-0cae-4490-902a-53145f6e548b}</UniqueIdentifier>
     </Filter>
     <Filter Include="player">
-      <UniqueIdentifier>{308c6975-5560-4821-b849-24a20b1828df}</UniqueIdentifier>
+      <UniqueIdentifier>{dc25b865-a7e9-4b36-9cb1-de750160dcb5}</UniqueIdentifier>
     </Filter>
     <Filter Include="player\nsf">
-      <UniqueIdentifier>{e88f3c4d-69c1-4c5a-af2a-ef205298fb29}</UniqueIdentifier>
+      <UniqueIdentifier>{81eb9243-fa65-4c28-b375-c4f3977c79e7}</UniqueIdentifier>
     </Filter>
     <Filter Include="player\plugin">
-      <UniqueIdentifier>{d022e51f-9bd1-4f11-9b27-e8d753298339}</UniqueIdentifier>
+      <UniqueIdentifier>{f25ca49e-5024-4280-a31f-9c08ab64344c}</UniqueIdentifier>
     </Filter>
     <Filter Include="player\plugin\kbmedia">
-      <UniqueIdentifier>{1daa3c0c-18c4-43eb-8894-915133a552ab}</UniqueIdentifier>
+      <UniqueIdentifier>{16ca5787-205d-41f7-8d2e-f7c7945d01d3}</UniqueIdentifier>
     </Filter>
     <Filter Include="player\plugin\winamp2">
-      <UniqueIdentifier>{8fc4dc41-8b58-411e-8063-1119e7bf9aad}</UniqueIdentifier>
+      <UniqueIdentifier>{6da2cf2e-c3d4-4978-a36d-797196f75b6a}</UniqueIdentifier>
     </Filter>
     <Filter Include="devices">
-      <UniqueIdentifier>{03c1ca25-ace0-47e4-b271-97af224db3fe}</UniqueIdentifier>
+      <UniqueIdentifier>{c79f7a58-9190-4b0f-8e2e-1bd9278901e6}</UniqueIdentifier>
     </Filter>
     <Filter Include="devices\cpu">
-      <UniqueIdentifier>{62d8f08b-6fce-4bdc-b071-ba507acb04df}</UniqueIdentifier>
+      <UniqueIdentifier>{780b9ef5-5f74-403d-b769-847ce61ee848}</UniqueIdentifier>
     </Filter>
     <Filter Include="devices\cpu\6502">
-      <UniqueIdentifier>{4d37c64a-3a16-4eb9-af81-416d73dbc35b}</UniqueIdentifier>
+      <UniqueIdentifier>{04d5bc8d-035d-4cdd-92e1-c66c8117c0c6}</UniqueIdentifier>
     </Filter>
     <Filter Include="devices\cpu\6502\km6502">
-      <UniqueIdentifier>{c04410fa-cd7f-4f0f-8d90-6d2cdcd8204c}</UniqueIdentifier>
+      <UniqueIdentifier>{d4915edb-5ab4-4bdd-89e7-bee0b4457922}</UniqueIdentifier>
     </Filter>
     <Filter Include="devices\audio">
-      <UniqueIdentifier>{e6ea0c18-7f54-43e2-a9ff-67b019ad72ba}</UniqueIdentifier>
+      <UniqueIdentifier>{edbda521-356c-4d1a-aad5-03c13eaa92ed}</UniqueIdentifier>
     </Filter>
     <Filter Include="devices\sound">
-      <UniqueIdentifier>{adcf3a52-3769-41d8-8ea9-bba708120494}</UniqueIdentifier>
+      <UniqueIdentifier>{399c150f-9f2e-43c6-8db8-051540475d99}</UniqueIdentifier>
     </Filter>
     <Filter Include="devices\sound\legacy">
-      <UniqueIdentifier>{1af04c42-a970-4f9e-bd1b-6a7f64dd631d}</UniqueIdentifier>
+      <UniqueIdentifier>{867fbeb5-040b-4509-b271-8d04eb7dd999}</UniqueIdentifier>
     </Filter>
     <Filter Include="devices\memory">
-      <UniqueIdentifier>{0488f7a0-8ed9-4de6-b357-b9ff150e1f91}</UniqueIdentifier>
+      <UniqueIdentifier>{648257e9-5f6b-4224-a3d6-299747411508}</UniqueIdentifier>
     </Filter>
     <Filter Include="devices\misc">
-      <UniqueIdentifier>{53050e85-48fb-4b7f-876a-23b9977d3ef6}</UniqueIdentifier>
+      <UniqueIdentifier>{5e0a88a0-ec7e-485f-808a-d83d1f0165b8}</UniqueIdentifier>
     </Filter>
     <Filter Include="utils">
-      <UniqueIdentifier>{5b225655-0fd1-4492-b9cb-909564bd613f}</UniqueIdentifier>
+      <UniqueIdentifier>{67d90b40-f926-4ea7-94f9-355a652270b6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
